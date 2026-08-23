@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Graphing Calculator</title>
+<style>
+  /* =========================================================================
+     Standalone graphing calculator (extracted from the Slate whiteboard).
+     Self-contained: no external fonts, scripts, or network requests.
+     Fills whatever container it's placed in (iframe, full page, or a div).
+     ========================================================================= */
+  :root {
+    --g-line: #e6e9ef;
+    --g-ink: #1f2d3d;
+    --g-mut: #5b697c;      /* bumped from #6b7787 for AA contrast on white */
+    --g-fld: #c7cdd8;
+    --g-blue: #2563eb;
+    --g-red: #dc2626;
+    --brass-500: #e0a82e;
+    --font-ui: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body { font-family: var(--font-ui); background: #fff; overflow: hidden; }
+  button { font-family: inherit; cursor: pointer; }
+  button:focus-visible, .gc-input:focus-visible, input:focus-visible, select:focus-visible {
+    outline: 2px solid var(--g-blue); outline-offset: 1px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+  }
+
+  .graphcalc {
+    width: 100%; height: 100dvh; min-width: 300px; min-height: 260px;
+    display: flex; flex-direction: column; background: #fff; color: var(--g-ink);
+    border: 2px solid #1e4b7a; border-radius: 14px;
+    box-shadow: 0 0 0 2px var(--brass-500); overflow: hidden; position: relative;
+  }
+  .gc-titlebar { min-height: 34px; display: flex; align-items: center; gap: 8px; padding: 0 8px 0 12px; background: #fff; color: var(--g-ink); border-bottom: 1px solid var(--g-line); font: 700 0.8rem var(--font-ui); letter-spacing: .3px; }
+  .gc-titlebar .gc-title { flex: 1; }
+  .gc-mini { background: #fff; color: var(--g-ink); border: 1px solid var(--g-fld); border-radius: 6px; font: 600 0.72rem var(--font-ui); padding: 4px 10px; cursor: pointer; min-width: 28px; min-height: 26px; }
+  .gc-mini:hover { border-color: var(--g-blue); color: var(--g-blue); }
+  .gc-main { flex: 1; display: flex; min-height: 0; }
+  .gc-side { width: 214px; flex: none; display: flex; flex-direction: column; min-height: 0; background: #fff; }
+  .gc-divider { flex: none; width: 8px; cursor: col-resize; background: var(--g-line); position: relative; touch-action: none; }
+  .gc-divider:hover, .gc-divider:active { background: var(--g-blue); }
+  .gc-divider:before { content: ""; position: absolute; left: 3px; top: 50%; width: 2px; height: 26px; margin-top: -13px; background: #b9c1cd; border-radius: 2px; }
+  .gc-list { flex: 1; overflow-y: auto; padding: 9px; }
+  .gc-item { display: flex; align-items: flex-start; gap: 7px; margin-bottom: 7px; }
+  .gc-color { width: 18px; height: 18px; flex: none; border: 2px solid rgba(0,0,0,.12); border-radius: 4px; cursor: pointer; padding: 0; margin-top: 7px; }
+  .gc-color.off { opacity: .3; }
+  .gc-exprstack { flex: 1; min-width: 0; }
+  .gc-input { width: 100%; min-height: 34px; box-sizing: border-box; background: #fff; border: 1px solid var(--g-fld); border-radius: 6px; color: var(--g-ink); font: 600 0.88rem var(--font-mono); padding: 6px 8px; outline: none; white-space: pre-wrap; word-break: break-word; cursor: text; line-height: 1.5; }
+  .gc-input:focus { border-color: var(--g-blue); box-shadow: 0 0 0 2px rgba(37,99,235,.14); }
+  .gc-input.gc-err { border-color: var(--g-red); }
+  .gc-input.empty:before { content: attr(data-ph); color: var(--g-mut); pointer-events: none; }
+  .gc-input sup { font-size: .74em; vertical-align: super; line-height: 0; }
+  .gc-frac { display: inline-flex; flex-direction: column; vertical-align: -0.42em; text-align: center; margin: 0 2px; }
+  .gc-num { border-bottom: 1.4px solid currentColor; padding: 0 4px; line-height: 1.2; }
+  .gc-den { padding: 0 4px; line-height: 1.2; }
+  .gc-eq { display: none; align-items: center; justify-content: flex-end; gap: 6px; padding: 4px 2px 0; }
+  .gc-eq-val { font: 700 0.82rem var(--font-mono); color: var(--g-blue); }
+  .gc-eq-tog { display: none; align-items: center; background: #fff; border: 1px solid var(--g-fld); color: var(--g-mut); font: 700 0.65rem var(--font-mono); border-radius: 5px; padding: 3px 7px; cursor: pointer; }
+  .gc-eq-tog:hover { border-color: var(--brass-500); color: #8a6a12; }
+  .gc-eq-tog.on { background: var(--brass-500); border-color: var(--brass-500); color: #3a2b06; }
+  .gc-del { width: 22px; height: 22px; flex: none; border: none; background: transparent; color: var(--g-mut); cursor: pointer; border-radius: 4px; font-size: 0.95rem; line-height: 1; margin-top: 6px; }
+  .gc-del.sm { width: 20px; height: 20px; font-size: 0.82rem; margin-top: 0; align-self: center; }
+  .gc-del:hover { background: var(--g-red); color: #fff; }
+  .gc-item-table { display: block; background: #f7f8fb; border: 1px solid var(--g-line); border-radius: 9px; padding: 7px; }
+  .gc-thead-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+  .gc-tcap { flex: 1; font: 700 0.7rem var(--font-ui); color: var(--g-ink); }
+  .gc-reg { background: #fff; color: var(--g-ink); border: 1px solid var(--g-fld); border-radius: 5px; font: 600 0.66rem var(--font-ui); padding: 3px 5px; cursor: pointer; }
+  .gc-tbl { display: flex; flex-direction: column; gap: 3px; }
+  .gc-trow { display: flex; gap: 4px; align-items: center; }
+  .gc-tinp { width: 0; flex: 1; min-width: 0; background: #fff; border: 1px solid var(--g-fld); border-radius: 4px; color: var(--g-ink); font: 600 0.78rem var(--font-mono); padding: 5px; outline: none; }
+  .gc-tinp:focus { border-color: var(--g-blue); }
+  .gc-tadd { align-self: flex-start; margin-top: 3px; background: transparent; border: none; color: var(--g-mut); font: 700 0.66rem var(--font-ui); cursor: pointer; padding: 3px; }
+  .gc-tadd:hover { color: var(--g-blue); }
+  .gc-reg-readout { display: none; margin-top: 7px; padding-top: 6px; border-top: 1px solid var(--g-line); }
+  .gc-reg-eq { font: 700 0.78rem var(--font-mono); color: var(--g-ink); word-break: break-word; }
+  .gc-reg-stats { display: flex; gap: 6px; margin-top: 5px; }
+  .gc-stat { font: 700 0.66rem var(--font-mono); color: #8a6a12; background: #fbf4df; border: 1px solid #efe1b8; border-radius: 5px; padding: 2px 7px; }
+  .gc-reg-note { font: 600 0.72rem var(--font-ui); color: var(--g-mut); }
+  .gc-addrow { display: flex; gap: 7px; padding: 9px; border-top: 1px solid var(--g-line); }
+  .gc-add { flex: 1; padding: 8px; background: #fff; border: 1px dashed var(--g-fld); border-radius: 7px; color: var(--g-ink); font: 700 0.72rem var(--font-ui); cursor: pointer; min-height: 34px; }
+  .gc-add:hover { color: var(--g-blue); border-color: var(--g-blue); }
+  .gc-plot { flex: 1; min-width: 0; min-height: 0; background: #fff; position: relative; }
+  .gc-plot canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
+  .gc-settings { position: absolute; left: 10px; top: 10px; display: none; flex-direction: column; gap: 6px; background: #fff; border: 1px solid var(--g-fld); border-radius: 9px; padding: 9px; box-shadow: 0 10px 26px rgba(15,25,45,.16); z-index: 5; }
+  .gc-settings.open { display: flex; }
+  .gc-settings label { display: flex; align-items: center; gap: 7px; font: 700 0.66rem var(--font-ui); color: var(--g-mut); }
+  .gc-settings input { width: 60px; background: #fff; border: 1px solid var(--g-fld); border-radius: 5px; color: var(--g-ink); font: 600 0.78rem var(--font-mono); padding: 5px 6px; outline: none; }
+  .gc-settings input:focus { border-color: var(--g-blue); }
+  .gc-zoom { position: absolute; right: 10px; bottom: 10px; display: flex; flex-direction: column; gap: 5px; }
+  .gc-zoom .gc-mini { width: 34px; height: 34px; padding: 0; font-size: 1rem; background: #fff; color: var(--g-ink); border-color: var(--g-fld); box-shadow: 0 2px 6px rgba(15,25,45,.12); }
+  .gc-zoom .gc-mini:hover { border-color: var(--g-blue); color: var(--g-blue); }
+  .gc-keyboard { position: absolute; left: 0; right: 0; bottom: 0; background: #fff; border-top: 1px solid var(--g-line); padding: 7px; display: none; z-index: 6; box-shadow: 0 -8px 22px rgba(15,25,45,.12); }
+  .gc-keyboard.open { display: block; }
+  .gc-kb-head { display: flex; align-items: center; justify-content: space-between; font: 700 0.66rem var(--font-ui); color: var(--g-mut); letter-spacing: .5px; text-transform: uppercase; padding: 0 2px 6px; }
+  .gc-kb-hide { background: transparent; border: none; color: var(--g-mut); font-size: 0.85rem; cursor: pointer; padding: 4px 8px; }
+  .gc-kb-hide:hover { color: var(--g-red); }
+  .gc-kb-row { display: flex; gap: 5px; margin-bottom: 5px; }
+  .gc-key { flex: 1; height: 42px; background: #f4f6f9; border: 1px solid var(--g-fld); border-radius: 7px; color: var(--g-ink); font: 700 0.95rem var(--font-ui); cursor: pointer; }
+  .gc-key:hover { background: #eaeef4; border-color: var(--g-blue); }
+  .gc-key:active { background: var(--brass-500); color: #3a2b06; border-color: var(--brass-500); }
+
+  /* Narrow embeds (phone-width iframes): stack the equation list above the plot */
+  .graphcalc.narrow .gc-main { flex-direction: column; }
+  .graphcalc.narrow .gc-side { width: 100% !important; max-height: 40%; }
+  .graphcalc.narrow .gc-divider { display: none; }
+
+  /* Printing an assignment page: show the graph area cleanly, hide controls */
+  @media print {
+    .graphcalc { border: 1px solid #999; box-shadow: none; height: auto; }
+    .gc-zoom, .gc-keyboard, .gc-addrow, .gc-settings, .gc-titlebar .gc-mini { display: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="graphcalc" id="gc">
+  <div class="gc-titlebar"><span class="gc-title">Graphing calculator</span>
+    <button class="gc-mini" data-gc="settings" title="Axis scale" aria-label="Axis scale settings">scale</button></div>
+  <div class="gc-main">
+    <div class="gc-side"><div class="gc-list"></div>
+      <div class="gc-addrow"><button class="gc-add" data-gc="add-expr">+ expression</button>
+        <button class="gc-add" data-gc="add-table">+ table</button>
+        <button class="gc-add" data-gc="kbd" title="Show / hide the on-screen keyboard" aria-label="Toggle on-screen keyboard">&#9000;</button></div></div>
+    <div class="gc-divider" title="Drag to resize" aria-hidden="true"></div>
+    <div class="gc-plot"><canvas aria-label="Graph area: drag to pan, scroll or pinch to zoom, click a curve to read a point"></canvas>
+      <div class="gc-settings"><label>x&nbsp;interval<input data-ax="x" placeholder="auto" aria-label="x axis interval"></label>
+        <label>y&nbsp;interval<input data-ax="y" placeholder="auto" aria-label="y axis interval"></label></div>
+      <div class="gc-zoom"><button class="gc-mini" data-gc="reset" title="Reset view" aria-label="Reset view">&#8962;</button>
+        <button class="gc-mini" data-gc="zin" title="Zoom in" aria-label="Zoom in">+</button>
+        <button class="gc-mini" data-gc="zout" title="Zoom out" aria-label="Zoom out">&#8722;</button></div></div>
+  </div>
+  <div class="gc-keyboard"></div>
+</div>
+
+<script>
+/* =========================================================================
+   Graphing engine — compiles x/y expressions to closures. No eval().
+   ========================================================================= */
+function gcBars(str) {
+  // turn |...| absolute-value bars into abs(...): a bar is an OPEN when the
+  // previous meaningful char starts a value, otherwise it's a CLOSE.
+  let out = "", prev = "";
+  const opensNext = (c) => c === "" || "+-*/^(,<>=|".indexOf(c) >= 0;
+  for (let k = 0; k < str.length; k++) {
+    const c = str[k];
+    if (c === "|") { if (opensNext(prev)) { out += "abs("; prev = "("; } else { out += ")"; prev = ")"; } }
+    else { out += c; if (c !== " ") prev = c; }
+  }
+  return out;
+}
+function gcCompile(src) {
+  const s = gcBars(String(src).replace(/×/g, "*").replace(/÷/g, "/").replace(/−/g, "-").replace(/√/g, "sqrt").replace(/π/g, "pi"));
+  const toks = []; let i = 0;
+  while (i < s.length) {
+    const c = s[i];
+    if (c === " ") { i++; continue; }
+    if (/[0-9.]/.test(c)) { let n = ""; while (i < s.length && /[0-9.]/.test(s[i])) n += s[i++]; toks.push({ t: "num", v: parseFloat(n) }); continue; }
+    if (/[a-zA-Z]/.test(c)) { let id = ""; while (i < s.length && /[a-zA-Z]/.test(s[i])) id += s[i++]; toks.push({ t: "id", v: id.toLowerCase() }); continue; }
+    if ("+-*/^()".includes(c)) { toks.push({ t: c }); i++; continue; }
+    throw new Error("bad char " + c);
+  }
+  let pos = 0; const peek = () => toks[pos];
+  const FUNCS = { sin: Math.sin, cos: Math.cos, tan: Math.tan, asin: Math.asin, acos: Math.acos, atan: Math.atan, ln: Math.log, log: (x) => Math.log(x) / Math.LN10, sqrt: Math.sqrt, abs: Math.abs, exp: Math.exp, floor: Math.floor, ceil: Math.ceil, round: Math.round };
+  const CONST = { pi: Math.PI, e: Math.E, tau: 2 * Math.PI };
+  function pExpr() { let f = pTerm(); for (;;) { const p = peek(); if (p && p.t === "+") { pos++; const r = pTerm(), a = f; f = (s) => a(s) + r(s); } else if (p && p.t === "-") { pos++; const r = pTerm(), a = f; f = (s) => a(s) - r(s); } else break; } return f; }
+  function pTerm() { let f = pFactor(); for (;;) { const p = peek(); if (p && p.t === "*") { pos++; const r = pFactor(), a = f; f = (s) => a(s) * r(s); } else if (p && p.t === "/") { pos++; const r = pFactor(), a = f; f = (s) => a(s) / r(s); } else if (p && (p.t === "num" || p.t === "id" || p.t === "(")) { const r = pFactor(), a = f; f = (s) => a(s) * r(s); } else break; } return f; }
+  function pFactor() { const p = peek(); if (p && p.t === "-") { pos++; const r = pFactor(); return (s) => -r(s); } if (p && p.t === "+") { pos++; return pFactor(); } let base = pPrimary(); if (peek() && peek().t === "^") { pos++; const e = pFactor(), b = base; base = (s) => Math.pow(b(s), e(s)); } return base; }
+  function pPrimary() {
+    const p = toks[pos++]; if (!p) throw new Error("end");
+    if (p.t === "num") { const v = p.v; return () => v; }
+    if (p.t === "(") { const f = pExpr(); if (peek() && peek().t === ")") pos++; return f; }
+    if (p.t === "id") {
+      const name = p.v;
+      if (peek() && peek().t === "(") { pos++; const arg = pExpr(); if (peek() && peek().t === ")") pos++; const fn = FUNCS[name]; if (!fn) throw new Error("fn " + name); return (s) => fn(arg(s)); }
+      if (name === "x") return (s) => s.x;
+      if (name === "y") return (s) => s.y;
+      if (name in CONST) { const v = CONST[name]; return () => v; }
+      if (FUNCS[name]) { const fn = FUNCS[name]; const arg = pFactor(); return (s) => fn(arg(s)); }
+      throw new Error("sym " + name);
+    }
+    throw new Error("tok");
+  }
+  const fn = pExpr(); if (pos < toks.length) throw new Error("malformed"); return fn;
+}
+function gcTopIndex(s, ch) { let d = 0; for (let i = 0; i < s.length; i++) { const c = s[i]; if (c === "(") d++; else if (c === ")") d--; else if (c === ch && d === 0) return i; } return -1; }
+function gcTryPoints(t) {
+  const groups = []; let i = 0; const n = t.length;
+  while (i < n) {
+    while (i < n && (t[i] === " " || t[i] === ",")) i++;
+    if (i >= n) break;
+    if (t[i] !== "(") return null;
+    let depth = 0, j = i;
+    for (; j < n; j++) { const c = t[j]; if (c === "(") depth++; else if (c === ")") { depth--; if (depth === 0) { j++; break; } } }
+    if (depth !== 0) return null;
+    const inner = t.slice(i + 1, j - 1); const cm = gcTopIndex(inner, ",");
+    if (cm < 0) return null;
+    try { const x = gcCompile(inner.slice(0, cm))({}); const y = gcCompile(inner.slice(cm + 1))({}); if (!isFinite(x) || !isFinite(y)) return null; groups.push([x, y]); } catch (e) { return null; }
+    i = j;
+  }
+  return groups.length ? groups : null;
+}
+/* --- least-squares regression helpers --- */
+function gcSolve(A, b) {
+  const n = A.length;
+  for (let i = 0; i < n; i++) { let p = i; for (let k = i + 1; k < n; k++) if (Math.abs(A[k][i]) > Math.abs(A[p][i])) p = k; [A[i], A[p]] = [A[p], A[i]]; [b[i], b[p]] = [b[p], b[i]]; if (Math.abs(A[i][i]) < 1e-12) return null; for (let k = i + 1; k < n; k++) { const f = A[k][i] / A[i][i]; for (let j = i; j < n; j++) A[k][j] -= f * A[i][j]; b[k] -= f * b[i]; } }
+  const x = new Array(n).fill(0);
+  for (let i = n - 1; i >= 0; i--) { let s = b[i]; for (let j = i + 1; j < n; j++) s -= A[i][j] * x[j]; x[i] = s / A[i][i]; }
+  return x;
+}
+function gcPolyfit(pts, deg) {
+  const n = deg + 1, A = [], B = [];
+  for (let i = 0; i < n; i++) { A[i] = []; for (let j = 0; j < n; j++) A[i][j] = pts.reduce((s, p) => s + Math.pow(p[0], i + j), 0); B[i] = pts.reduce((s, p) => s + p[1] * Math.pow(p[0], i), 0); }
+  const c = gcSolve(A, B); if (!c) return null;
+  return { c, f: (x) => c.reduce((s, ci, i) => s + ci * Math.pow(x, i), 0) };
+}
+function gcR2(pts, f) { const ym = pts.reduce((s, p) => s + p[1], 0) / pts.length; let ssr = 0, sst = 0; pts.forEach((p) => { ssr += Math.pow(p[1] - f(p[0]), 2); sst += Math.pow(p[1] - ym, 2); }); return sst === 0 ? 1 : 1 - ssr / sst; }
+function gcLinear(pts) { const n = pts.length; let sx = 0, sy = 0, sxy = 0, sxx = 0, syy = 0; pts.forEach(([x, y]) => { sx += x; sy += y; sxy += x * y; sxx += x * x; syy += y * y; }); const d = n * sxx - sx * sx; if (Math.abs(d) < 1e-12) return null; const m = (n * sxy - sx * sy) / d, b = (sy - m * sx) / n; const rd = Math.sqrt((n * sxx - sx * sx) * (n * syy - sy * sy)); return { m, b, r: rd === 0 ? 1 : (n * sxy - sx * sy) / rd, f: (x) => m * x + b }; }
+function gcExp(pts) { if (pts.some((p) => p[1] <= 0)) return null; const L = gcLinear(pts.map(([x, y]) => [x, Math.log(y)])); if (!L) return null; const a = Math.exp(L.b), b = Math.exp(L.m); return { a, b, f: (x) => a * Math.pow(b, x) }; }
+function gcPower(pts) { if (pts.some((p) => p[0] <= 0 || p[1] <= 0)) return null; const L = gcLinear(pts.map(([x, y]) => [Math.log(x), Math.log(y)])); if (!L) return null; const a = Math.exp(L.b), b = L.m; return { a, b, f: (x) => a * Math.pow(x, b) }; }
+function gcLog(pts) { if (pts.some((p) => p[0] <= 0)) return null; const L = gcLinear(pts.map(([x, y]) => [Math.log(x), y])); if (!L) return null; return { a: L.b, b: L.m, f: (x) => L.b + L.m * Math.log(x) }; }
+function gcFmt(n) { if (n == null || !isFinite(n)) return "?"; const a = Math.abs(n); if (a !== 0 && (a >= 1e5 || a < 1e-3)) return n.toExponential(3); return (Math.round(n * 10000) / 10000).toString(); }
+function gcNiceStep(range, target) { if (!(range > 0)) return 1; const raw = range / target, mag = Math.pow(10, Math.floor(Math.log10(raw))), norm = raw / mag; const step = norm < 1.5 ? 1 : norm < 3 ? 2 : norm < 7 ? 5 : 10; return step * mag; }
+function gcHasVar(str, v) { return new RegExp("(^|[^a-zA-Z])" + v + "([^a-zA-Z]|$)").test(str); }
+function gcFindIneq(t) { let d = 0; for (let i = 0; i < t.length; i++) { const c = t[i]; if (c === "(") d++; else if (c === ")") d--; else if (d === 0 && (c === "<" || c === ">")) { const two = t[i + 1] === "="; return { pos: i, op: c + (two ? "=" : "") }; } } return null; }
+function gcAnalyze(raw) {
+  const t = String(raw).trim().replace(/\u2264/g, "<=").replace(/\u2265/g, ">="); if (!t) return { kind: "empty" };
+  const pts = gcTryPoints(t); if (pts) return { kind: "points", points: pts };
+  try {
+    const iq = gcFindIneq(t);
+    if (iq) {
+      const lhs = t.slice(0, iq.pos).trim(), rhs = t.slice(iq.pos + iq.op.length).trim();
+      const Lc = gcCompile(lhs), Rc = gcCompile(rhs), G = (s) => Lc(s) - Rc(s);
+      const gt = iq.op === ">" || iq.op === ">=", strict = iq.op === "<" || iq.op === ">";
+      const test = gt ? (s) => G(s) >= 0 : (s) => G(s) <= 0;
+      return { kind: "inequality", F: G, test, strict, gt };
+    }
+    const k = gcTopIndex(t, "=");
+    if (k >= 0) {
+      const lhs = t.slice(0, k).trim(), rhs = t.slice(k + 1).trim();
+      const Lc = gcCompile(lhs), Rc = gcCompile(rhs), F = (s) => Lc(s) - Rc(s);
+      if (lhs === "y" && !gcHasVar(rhs, "y")) return { kind: "func", F, f: (x) => Rc({ x }) };
+      if (lhs === "x" && !gcHasVar(rhs, "x") && !gcHasVar(rhs, "y")) return { kind: "vline", F, c: Rc({}) };
+      return { kind: "implicit", F };
+    }
+    if (!gcHasVar(t, "x") && !gcHasVar(t, "y")) { const v = gcCompile(t)({}); return isFinite(v) ? { kind: "calc", value: v } : { kind: "error" }; }
+    const E = gcCompile(t);
+    if (!gcHasVar(t, "y")) return { kind: "func", F: (s) => s.y - E(s), f: (x) => E({ x }) };
+    return { kind: "implicit", F: (s) => s.y - E(s) };
+  } catch (e) { return { kind: "error", msg: e.message }; }
+}
+function gcBisect(f, a, b) { let fa = f(a); for (let i = 0; i < 40; i++) { const m = (a + b) / 2, fm = f(m); if (!isFinite(fm)) return m; if ((fa < 0) !== (fm < 0)) b = m; else { a = m; fa = fm; } } return (a + b) / 2; }
+function gcExtremum(f, a, b, wantMax) { for (let i = 0; i < 40; i++) { const m1 = a + (b - a) / 3, m2 = b - (b - a) / 3, f1 = f(m1), f2 = f(m2); if (wantMax ? (f1 < f2) : (f1 > f2)) a = m1; else b = m2; } const x = (a + b) / 2; return { x, y: f(x) }; }
+function gcFindFeatures(funcs, xmin, xmax) {
+  const feats = [], N = 400, dx = (xmax - xmin) / N;
+  funcs.forEach((f) => {
+    let px = xmin, py = f(xmin), pslope = null;
+    if (xmin <= 0 && xmax >= 0) { const y0 = f(0); if (isFinite(y0)) feats.push({ x: 0, y: y0, type: "y-intercept" }); }
+    for (let i = 1; i <= N; i++) {
+      const x = xmin + i * dx, y = f(x);
+      if (isFinite(py) && isFinite(y)) {
+        if ((py < 0) !== (y < 0)) { const r = gcBisect(f, px, x); feats.push({ x: r, y: 0, type: "x-intercept" }); }
+        const slope = (y - py) / dx;
+        if (pslope != null && isFinite(slope)) { if (pslope > 0 && slope < 0) { const e = gcExtremum(f, px - dx, x, true); feats.push({ x: e.x, y: e.y, type: "maximum" }); } else if (pslope < 0 && slope > 0) { const e = gcExtremum(f, px - dx, x, false); feats.push({ x: e.x, y: e.y, type: "minimum" }); } }
+        pslope = slope;
+      }
+      px = x; py = y;
+    }
+  });
+  for (let i = 0; i < funcs.length; i++) for (let j = i + 1; j < funcs.length; j++) {
+    const d = (x) => funcs[i](x) - funcs[j](x); let px = xmin, pd = d(xmin);
+    for (let k = 1; k <= N; k++) { const x = xmin + k * (xmax - xmin) / N, dv = d(x); if (isFinite(pd) && isFinite(dv) && (pd < 0) !== (dv < 0)) { const r = gcBisect(d, px, x); feats.push({ x: r, y: funcs[i](r), type: "intersection" }); } px = x; pd = dv; }
+  }
+  return feats.filter((ft) => isFinite(ft.x) && isFinite(ft.y));
+}
+
+/* =========================================================================
+   Calculator UI
+   ========================================================================= */
+(function () {
+  const COLORS = ["#2563eb", "#dc2626", "#059669", "#d97706", "#7c3aed", "#0891b2"];
+  let colorSeq = 0;
+  const nextColor = () => COLORS[(colorSeq++) % COLORS.length];
+  const MONO = "ui-monospace, 'SF Mono', 'Cascadia Mono', Consolas, monospace";
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+  const ZWSP = "\u200b";
+
+  const wrap = document.getElementById("gc");
+  const listEl = wrap.querySelector(".gc-list");
+  const plotEl = wrap.querySelector(".gc-plot");
+  const canvas = wrap.querySelector("canvas");
+  const g = canvas.getContext("2d");
+  const kbEl = wrap.querySelector(".gc-keyboard");
+  const settingsEl = wrap.querySelector(".gc-settings");
+
+  // ---------- URL configuration (for embedding in assignments) ----------
+  // ?eq=y%3Dx%5E2&eq=(2%2C3)  — preload equations/points (repeatable)
+  // ?win=-10,10,-5,5          — initial window: xmin,xmax,ymin,ymax
+  // ?kbd=1                    — open the on-screen keyboard at load
+  const qs = new URLSearchParams(location.search);
+  const presetEqs = qs.getAll("eq").map((s) => s.trim()).filter(Boolean);
+  let presetWin = null;
+  if (qs.get("win")) {
+    const p = qs.get("win").split(",").map(parseFloat);
+    if (p.length === 4 && p.every(isFinite) && p[1] > p[0] && p[3] > p[2]) presetWin = p;
+  }
+
+  // ---------- graph state ----------
+  let cx = 0, cy = 0, ppu = 30, W = 1, H = 1;
+  let stepX = null, stepY = null;      // custom axis intervals (null = auto)
+  let readoutPt = null;                // { x, y, type? }
+  function defaultView() { const h = plotEl.clientHeight || 300; ppu = Math.max(8, h / 20); cx = 0; cy = 0; }
+  const d2sx = (x) => W / 2 + (x - cx) * ppu;
+  const d2sy = (y) => H / 2 - (y - cy) * ppu;
+  const s2dx = (sx) => cx + (sx - W / 2) / ppu;
+  const s2dy = (sy) => cy - (sy - H / 2) / ppu;
+  const tickLabel = (v) => { if (Math.abs(v) < 1e-9) return "0"; const a = Math.abs(v); if (a >= 1e4 || a < 1e-3) return v.toExponential(0); return (Math.round(v * 1000) / 1000).toString(); };
+  let segStore = [], markStore = [];
+
+  // ---------- items ----------
+  let items = [];
+  function newExpr(text) { return { id: Math.random().toString(36).slice(2), kind: "expr", color: nextColor(), visible: true, text: text || "" }; }
+  function newTable() { return { id: Math.random().toString(36).slice(2), kind: "table", color: nextColor(), visible: true, rows: [["", ""], ["", ""], ["", ""]], reg: "none" }; }
+  if (presetEqs.length) presetEqs.forEach((t) => items.push(newExpr(t)));
+  else items.push(newExpr(""));
+
+  // ---------- math field (contenteditable: superscripts + fractions) ----------
+  function gcSerialize(node) {
+    let out = "";
+    node.childNodes.forEach((ch) => {
+      if (ch.nodeType === 3) out += ch.textContent.split(ZWSP).join("");
+      else if (ch.nodeType === 1 && ch.classList && ch.classList.contains("gc-frac")) {
+        const num = ch.querySelector(".gc-num"), den = ch.querySelector(".gc-den");
+        const ns = num ? gcSerialize(num).trim() : "", ds = den ? gcSerialize(den).trim() : "";
+        if (ns && ds) out += "((" + ns + ")/(" + ds + "))"; else out += ns;
+      }
+      else if (ch.nodeType === 1 && ch.tagName === "SUP") { const inner = gcSerialize(ch); if (inner.trim() !== "") out += "^(" + inner + ")"; }
+      else if (ch.nodeType === 1) out += gcSerialize(ch);
+    });
+    return out;
+  }
+  function caretSup(el) {
+    const sel = window.getSelection(); if (!sel.rangeCount) return null;
+    let n = sel.getRangeAt(0).startContainer;
+    while (n && n !== el) { if (n.nodeType === 1 && n.tagName === "SUP") return n; n = n.parentNode; }
+    return null;
+  }
+  function caretFrac(el) {
+    const sel = window.getSelection(); if (!sel.rangeCount) return null;
+    let n = sel.getRangeAt(0).startContainer; if (n.nodeType === 3) n = n.parentNode;
+    while (n && n !== el) { if (n.classList && n.classList.contains("gc-num")) return { frac: n.parentNode, slot: "num", node: n }; if (n.classList && n.classList.contains("gc-den")) return { frac: n.parentNode, slot: "den", node: n }; n = n.parentNode; }
+    return null;
+  }
+  function caretToEnd(node) { const s = window.getSelection(); const r = document.createRange(); r.selectNodeContents(node); r.collapse(false); s.removeAllRanges(); s.addRange(r); }
+  function caretToStart(node) { const s = window.getSelection(); const r = document.createRange(); r.selectNodeContents(node); r.collapse(true); s.removeAllRanges(); s.addRange(r); }
+  function caretAfter(node) { const s = window.getSelection(); const r = document.createRange(); if (!node.nextSibling || node.nextSibling.nodeType !== 3) node.parentNode.insertBefore(document.createTextNode(ZWSP), node.nextSibling); r.setStart(node.nextSibling, 1); r.collapse(true); s.removeAllRanges(); s.addRange(r); }
+  function enterSup(el) {
+    el.focus();
+    const sel = window.getSelection(); if (!sel.rangeCount) return;
+    const r = sel.getRangeAt(0); r.deleteContents();
+    const sup = document.createElement("sup"); sup.appendChild(document.createTextNode(ZWSP));
+    r.insertNode(sup);
+    const rr = document.createRange(); rr.setStart(sup.firstChild, 1); rr.collapse(true);
+    sel.removeAllRanges(); sel.addRange(rr);
+  }
+  function exitSup(el) {
+    const sup = caretSup(el); if (!sup) return false;
+    caretAfter(sup); return true;
+  }
+  function makeFrac(numText) {
+    const f = document.createElement("span"); f.className = "gc-frac";
+    const num = document.createElement("span"); num.className = "gc-num"; num.appendChild(document.createTextNode(numText || ZWSP));
+    const den = document.createElement("span"); den.className = "gc-den"; den.appendChild(document.createTextNode(ZWSP));
+    f.append(num, den); return f;
+  }
+  function insertFraction(el) {
+    el.focus();
+    const sel = window.getSelection(); if (!sel.rangeCount) return;
+    const r = sel.getRangeAt(0); r.deleteContents();
+    let numText = "";
+    const cont = r.startContainer, off = r.startOffset;
+    if (cont.nodeType === 3) { const before = cont.data.slice(0, off); const m = before.match(/[A-Za-z0-9.]+$/); if (m) { numText = m[0]; cont.data = cont.data.slice(0, off - m[0].length) + cont.data.slice(off); r.setStart(cont, off - m[0].length); r.collapse(true); } }
+    const frac = makeFrac(numText);
+    r.insertNode(frac);
+    caretAfter(frac); // guarantee a landing node after
+    const target = numText ? frac.querySelector(".gc-den") : frac.querySelector(".gc-num");
+    caretToEnd(target);
+  }
+  function insertCE(el, txt) {
+    el.focus();
+    const sel = window.getSelection();
+    if (!sel.rangeCount) { el.appendChild(document.createTextNode(txt)); return; }
+    const r = sel.getRangeAt(0); r.deleteContents();
+    const node = document.createTextNode(txt); r.insertNode(node);
+    r.setStartAfter(node); r.collapse(true); sel.removeAllRanges(); sel.addRange(r);
+  }
+
+  // ---------- drawing ----------
+  function axStep(auto, custom) { return (custom != null && isFinite(custom) && custom > 0) ? custom : auto; }
+  function drawGrid() {
+    const xmin = s2dx(0), xmax = s2dx(W), ymin = s2dy(H), ymax = s2dy(0);
+    const majX = axStep(gcNiceStep(xmax - xmin, Math.max(2, W / 80)), stepX);
+    const majY = axStep(gcNiceStep(ymax - ymin, Math.max(2, H / 70)), stepY);
+    const mnX = majX / 5, mnY = majY / 5;
+    g.lineWidth = 1;
+    g.strokeStyle = "#f2f4f7";
+    if ((xmax - xmin) / mnX < 600) for (let x = Math.ceil(xmin / mnX) * mnX; x <= xmax; x += mnX) { const px = d2sx(x); g.beginPath(); g.moveTo(px, 0); g.lineTo(px, H); g.stroke(); }
+    if ((ymax - ymin) / mnY < 600) for (let y = Math.ceil(ymin / mnY) * mnY; y <= ymax; y += mnY) { const py = d2sy(y); g.beginPath(); g.moveTo(0, py); g.lineTo(W, py); g.stroke(); }
+    g.strokeStyle = "#dee2e9";
+    for (let x = Math.ceil(xmin / majX) * majX; x <= xmax; x += majX) { const px = d2sx(x); g.beginPath(); g.moveTo(px, 0); g.lineTo(px, H); g.stroke(); }
+    for (let y = Math.ceil(ymin / majY) * majY; y <= ymax; y += majY) { const py = d2sy(y); g.beginPath(); g.moveTo(0, py); g.lineTo(W, py); g.stroke(); }
+    const ax = d2sx(0), ay = d2sy(0);
+    g.strokeStyle = "#1f2733"; g.lineWidth = 2.2;
+    if (ay >= 0 && ay <= H) { g.beginPath(); g.moveTo(0, ay); g.lineTo(W, ay); g.stroke(); }
+    if (ax >= 0 && ax <= W) { g.beginPath(); g.moveTo(ax, 0); g.lineTo(ax, H); g.stroke(); }
+    g.fillStyle = "#4a5563"; g.font = "11px " + MONO;
+    const ly = clamp(ay, 2, H - 15);
+    g.textAlign = "center"; g.textBaseline = "top";
+    for (let x = Math.ceil(xmin / majX) * majX; x <= xmax; x += majX) { if (Math.abs(x) < 1e-9) continue; g.fillText(tickLabel(x), d2sx(x), ly + 3); }
+    const lx = clamp(ax, 16, W - 3);
+    g.textAlign = "right"; g.textBaseline = "middle";
+    for (let y = Math.ceil(ymin / majY) * majY; y <= ymax; y += majY) { if (Math.abs(y) < 1e-9) continue; g.fillText(tickLabel(y), lx - 4, d2sy(y)); }
+  }
+  function drawMarker(x, y, color) {
+    const sx = d2sx(x), sy = d2sy(y);
+    if (sx < -20 || sx > W + 20 || sy < -20 || sy > H + 20) return;
+    g.beginPath(); g.arc(sx, sy, 4.2, 0, 7); g.fillStyle = color; g.fill();
+    g.lineWidth = 1.4; g.strokeStyle = "#fff"; g.stroke();
+    markStore.push({ sx, sy, x, y });
+  }
+  function marchingSquares(F, color, dashed) {
+    const step = 7, cols = Math.ceil(W / step), rows = Math.ceil(H / step);
+    const val = [];
+    for (let gi = 0; gi <= cols; gi++) { val[gi] = []; for (let gj = 0; gj <= rows; gj++) { const dx = s2dx(gi * step), dy = s2dy(gj * step); let v; try { v = F({ x: dx, y: dy }); } catch (e) { v = NaN; } val[gi][gj] = isFinite(v) ? v : NaN; } }
+    g.save();
+    // Dash pattern must be shorter than one marching-squares segment (~7px):
+    // the canvas resets dashing at every moveTo, so [7,5] rendered solid.
+    g.strokeStyle = color; g.lineWidth = 2.2; if (dashed) g.setLineDash([4, 9]); g.beginPath();
+    for (let gi = 0; gi < cols; gi++) for (let gj = 0; gj < rows; gj++) {
+      const x0 = gi * step, y0 = gj * step, x1 = x0 + step, y1 = y0 + step;
+      const a = val[gi][gj], b = val[gi + 1][gj], c = val[gi + 1][gj + 1], d = val[gi][gj + 1];
+      if (!isFinite(a) || !isFinite(b) || !isFinite(c) || !isFinite(d)) continue;
+      const P = [];
+      if ((a < 0) !== (b < 0)) P.push([x0 + step * (a / (a - b)), y0]);
+      if ((b < 0) !== (c < 0)) P.push([x1, y0 + step * (b / (b - c))]);
+      if ((d < 0) !== (c < 0)) P.push([x0 + step * (d / (d - c)), y1]);
+      if ((a < 0) !== (d < 0)) P.push([x0, y0 + step * (a / (a - d))]);
+      if (P.length >= 2) { g.moveTo(P[0][0], P[0][1]); g.lineTo(P[1][0], P[1][1]); segStore.push({ sx: P[0][0], sy: P[0][1] }, { sx: P[1][0], sy: P[1][1] }); if (P.length === 4) { g.moveTo(P[2][0], P[2][1]); g.lineTo(P[3][0], P[3][1]); segStore.push({ sx: P[2][0], sy: P[2][1] }, { sx: P[3][0], sy: P[3][1] }); } }
+    }
+    g.stroke(); g.restore();
+  }
+  function hexToRgba(hex, a) { const m = /^#?([0-9a-f]{6})$/i.exec(hex); if (!m) return "rgba(37,99,235," + a + ")"; const n = parseInt(m[1], 16); return "rgba(" + ((n >> 16) & 255) + "," + ((n >> 8) & 255) + "," + (n & 255) + "," + a + ")"; }
+  function drawInequality(it, an) {
+    const step = 5;
+    g.save(); g.fillStyle = hexToRgba(it.color, 0.15);
+    for (let px = 0; px < W; px += step) for (let py = 0; py < H; py += step) { const x = s2dx(px + step / 2), y = s2dy(py + step / 2); let ok; try { ok = an.test({ x, y }); } catch (e) { ok = false; } if (ok) g.fillRect(px, py, step, step); }
+    g.restore();
+    marchingSquares(an.F, it.color, an.strict);
+  }
+  function drawCurve(f, color) {
+    g.strokeStyle = color; g.lineWidth = 2.2; g.beginPath(); let started = false;
+    for (let px = 0; px <= W; px += 2) { const x = s2dx(px), y = f(x); if (!isFinite(y)) { started = false; continue; } const py = d2sy(y); if (py < -3000 || py > H + 3000) { started = false; continue; } if (!started) { g.moveTo(px, py); started = true; } else g.lineTo(px, py); segStore.push({ sx: px, sy: py }); }
+    g.stroke();
+  }
+  function setErr(item, isErr) { if (item._field) item._field.classList.toggle("gc-err", !!isErr); }
+  function decToFrac(x) {
+    if (!isFinite(x)) return null;
+    const neg = x < 0; x = Math.abs(x);
+    if (Math.abs(x - Math.round(x)) < 1e-12) return { n: (neg ? -1 : 1) * Math.round(x), d: 1 };
+    let h1 = 1, h0 = 0, k1 = 0, k0 = 1, b = x; const maxD = 1000000;
+    for (let i = 0; i < 64; i++) { const a = Math.floor(b), h2 = a * h1 + h0, k2 = a * k1 + k0; if (k2 > maxD) break; h0 = h1; h1 = h2; k0 = k1; k1 = k2; if (Math.abs(h1 / k1 - x) < 1e-12) break; const fr = b - a; if (fr < 1e-12) break; b = 1 / fr; }
+    return { n: (neg ? -1 : 1) * h1, d: k1 };
+  }
+  function renderCalc(item) {
+    const eq = item._eq; if (!eq) return;
+    if (item._calcValue == null) { eq.style.display = "none"; return; }
+    eq.style.display = "flex";
+    const v = item._calcValue;
+    const fr = decToFrac(v);
+    const canFrac = fr && fr.d !== 1;
+    if (item._fracMode && canFrac) item._eqVal.textContent = "= " + fr.n + "/" + fr.d;
+    else item._eqVal.textContent = "= " + gcFmt(v);
+    item._eqTog.style.display = canFrac ? "inline-flex" : "none";
+    item._eqTog.classList.toggle("on", !!item._fracMode);
+  }
+
+  function drawExpr(it) {
+    const an = gcAnalyze(it.text); it._an = an;
+    it._calcValue = an.kind === "calc" ? an.value : null;
+    renderCalc(it);
+    if (an.kind === "points") { an.points.forEach((p) => drawMarker(p[0], p[1], it.color)); setErr(it, false); }
+    else if (an.kind === "calc") { setErr(it, false); }
+    else if (an.kind === "inequality") { drawInequality(it, an); setErr(it, false); }
+    else if (an.kind === "func" || an.kind === "vline" || an.kind === "implicit") { marchingSquares(an.F, it.color); setErr(it, false); }
+    else if (an.kind === "error") { setErr(it, true); }
+    else setErr(it, false);
+  }
+  function tablePoints(it) { return it.rows.map((r) => [parseFloat(r[0]), parseFloat(r[1])]).filter((p) => isFinite(p[0]) && isFinite(p[1])); }
+  function tableFit(pts, reg) {
+    const sgn = (n) => (n < 0 ? " \u2212 " : " + ") + gcFmt(Math.abs(n));
+    if (reg === "linear") { const L = gcLinear(pts); if (!L) return null; return { f: L.f, eqn: "y = " + gcFmt(L.m) + "x" + sgn(L.b), r2: gcR2(pts, L.f), r: L.r }; }
+    if (reg === "quadratic") { if (pts.length < 3) return null; const Q = gcPolyfit(pts, 2); if (!Q) return null; const c = Q.c; return { f: Q.f, eqn: "y = " + gcFmt(c[2]) + "x\u00b2" + sgn(c[1]) + "x" + sgn(c[0]), r2: gcR2(pts, Q.f) }; }
+    if (reg === "cubic") { if (pts.length < 4) return null; const C = gcPolyfit(pts, 3); if (!C) return null; const c = C.c; return { f: C.f, eqn: "y = " + gcFmt(c[3]) + "x\u00b3" + sgn(c[2]) + "x\u00b2" + sgn(c[1]) + "x" + sgn(c[0]), r2: gcR2(pts, C.f) }; }
+    if (reg === "exponential") { const E = gcExp(pts); if (!E) return null; return { f: E.f, eqn: "y = " + gcFmt(E.a) + "\u00b7" + gcFmt(E.b) + "^x", r2: gcR2(pts, E.f) }; }
+    if (reg === "power") { const P = gcPower(pts); if (!P) return null; return { f: P.f, eqn: "y = " + gcFmt(P.a) + "x^" + gcFmt(P.b), r2: gcR2(pts, P.f) }; }
+    if (reg === "logarithmic") { const G = gcLog(pts); if (!G) return null; return { f: G.f, eqn: "y = " + gcFmt(G.a) + sgn(G.b) + "ln x", r2: gcR2(pts, G.f) }; }
+    return null;
+  }
+  function drawTable(it) {
+    const pts = tablePoints(it);
+    pts.forEach((p) => drawMarker(p[0], p[1], it.color));
+    const ro = it._readout; if (!ro) return;
+    if (it.reg === "none") { ro.innerHTML = ""; ro.style.display = "none"; return; }
+    if (pts.length < 2) { ro.innerHTML = '<span class="gc-reg-note">Add at least 2 points.</span>'; ro.style.display = "block"; return; }
+    const fit = tableFit(pts, it.reg);
+    ro.style.display = "block";
+    if (!fit) { ro.innerHTML = '<span class="gc-reg-note">Not enough points for that model.</span>'; return; }
+    drawCurve(fit.f, it.color);
+    let stats = '<span class="gc-stat">R\u00b2 ' + gcFmt(fit.r2) + "</span>";
+    if (fit.r != null) stats += '<span class="gc-stat">r ' + gcFmt(fit.r) + "</span>";
+    ro.innerHTML = '<div class="gc-reg-eq">' + fit.eqn + '</div><div class="gc-reg-stats">' + stats + "</div>";
+  }
+  function drawReadout() {
+    const sx = d2sx(readoutPt.x), sy = d2sy(readoutPt.y);
+    g.beginPath(); g.arc(sx, sy, 5, 0, 7); g.fillStyle = "#111827"; g.fill(); g.lineWidth = 2; g.strokeStyle = "#fff"; g.stroke();
+    const coord = "(" + gcFmt(readoutPt.x) + ", " + gcFmt(readoutPt.y) + ")";
+    const line1 = readoutPt.type || "";
+    g.font = "600 12px " + MONO;
+    const tw = Math.max(g.measureText(coord).width, line1 ? g.measureText(line1).width : 0);
+    const bh = line1 ? 32 : 20;
+    let bx = sx + 9, by = sy - bh - 6; if (bx + tw + 14 > W) bx = sx - tw - 23; if (by < 0) by = sy + 10;
+    g.fillStyle = "rgba(17,24,39,.92)"; g.beginPath(); if (g.roundRect) g.roundRect(bx, by, tw + 14, bh, 5); else g.rect(bx, by, tw + 14, bh); g.fill();
+    g.textAlign = "left"; g.textBaseline = "middle";
+    if (line1) { g.fillStyle = "#e6c573"; g.font = "600 10px " + MONO; g.fillText(line1, bx + 7, by + 9); g.fillStyle = "#fff"; g.font = "600 12px " + MONO; g.fillText(coord, bx + 7, by + 23); }
+    else { g.fillStyle = "#fff"; g.fillText(coord, bx + 7, by + 10); }
+  }
+  function redraw() {
+    W = plotEl.clientWidth; H = plotEl.clientHeight; const dpr = window.devicePixelRatio || 1;
+    if (W < 4 || H < 4) return;
+    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+    g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+    drawGrid();
+    segStore = []; markStore = [];
+    items.forEach((it) => { if (!it.visible) return; if (it.kind === "expr") drawExpr(it); else drawTable(it); });
+    if (readoutPt) drawReadout();
+  }
+
+  // ---------- list UI ----------
+  function colorChip(it) { const b = document.createElement("button"); b.className = "gc-color"; b.style.background = it.color; b.title = "Show / hide"; b.setAttribute("aria-label", "Show or hide this graph"); b.addEventListener("click", (e) => { e.stopPropagation(); it.visible = !it.visible; b.classList.toggle("off", !it.visible); redraw(); }); return b; }
+  function delBtn(it, cls) { const b = document.createElement("button"); b.className = "gc-del" + (cls ? " " + cls : ""); b.textContent = "\u00d7"; b.title = "Delete"; b.setAttribute("aria-label", "Delete"); b.addEventListener("click", (e) => { e.stopPropagation(); removeItem(it); }); return b; }
+
+  function buildExprRow(it, ph) {
+    const row = document.createElement("div"); row.className = "gc-item"; it._row = row;
+    const stack = document.createElement("div"); stack.className = "gc-exprstack";
+    const field = document.createElement("div"); field.className = "gc-input"; field.contentEditable = "true"; field.spellcheck = false;
+    field.setAttribute("role", "textbox"); field.setAttribute("aria-label", "Equation or expression");
+    field.setAttribute("data-ph", ph || "");
+    if (it.text) field.textContent = it.text;
+    it._field = field;
+    const eq = document.createElement("div"); eq.className = "gc-eq"; eq.style.display = "none"; it._eq = eq;
+    const eqVal = document.createElement("span"); eqVal.className = "gc-eq-val"; it._eqVal = eqVal;
+    const eqTog = document.createElement("button"); eqTog.className = "gc-eq-tog"; eqTog.type = "button"; eqTog.textContent = "a\u2044b"; eqTog.title = "Show as fraction"; eqTog.style.display = "none"; it._eqTog = eqTog;
+    eqTog.addEventListener("click", (e) => { e.stopPropagation(); it._fracMode = !it._fracMode; renderCalc(it); });
+    eq.append(eqVal, eqTog);
+    field.addEventListener("focus", () => { activeEl = field; clearTimeout(hideTimer); });
+    field.addEventListener("blur", () => { hideTimer = setTimeout(() => { if (!wrap.contains(document.activeElement)) hideKeyboard(); }, 200); });
+    field.addEventListener("input", () => { it.text = gcSerialize(field); field.classList.toggle("empty", field.textContent.replace(/\u200b/g, "").trim() === ""); redraw(); });
+    field.addEventListener("keydown", (e) => {
+      if (e.key === "^") { e.preventDefault(); enterSup(field); return; }
+      if (e.key === "/") { e.preventDefault(); insertFraction(field); return; }
+      const fs = caretFrac(field);
+      if (e.key === "ArrowUp" && fs && fs.slot === "den") { e.preventDefault(); caretToEnd(fs.frac.querySelector(".gc-num")); return; }
+      if (e.key === "ArrowDown" && fs && fs.slot === "num") { e.preventDefault(); caretToEnd(fs.frac.querySelector(".gc-den")); return; }
+      if ((e.key === "ArrowRight" || e.key === "ArrowDown") && fs && fs.slot === "den") { e.preventDefault(); caretAfter(fs.frac); return; }
+      if (e.key === "ArrowRight" && fs && fs.slot === "num") { e.preventDefault(); caretToStart(fs.frac.querySelector(".gc-den")); return; }
+      if ((e.key === "ArrowRight" || e.key === "ArrowDown") && caretSup(field)) { if (exitSup(field)) e.preventDefault(); return; }
+      if (e.key === "Enter" || e.key === "Tab") { e.preventDefault(); nextExpr(it); return; }
+    });
+    field.classList.toggle("empty", !it.text);
+    stack.append(field, eq);
+    row.append(colorChip(it), stack, delBtn(it));
+    return row;
+  }
+  function nextExpr(it) {
+    const i = items.indexOf(it);
+    const after = items[i + 1];
+    if (after && after.kind === "expr") { after._field.focus(); placeCaretEnd(after._field); return; }
+    const ne = newExpr(""); items.splice(i + 1, 0, ne);
+    const rowEl = buildExprRow(ne); listEl.insertBefore(rowEl, it._row.nextSibling);
+    ne._field.focus();
+  }
+  function placeCaretEnd(el) { const r = document.createRange(); r.selectNodeContents(el); r.collapse(false); const s = window.getSelection(); s.removeAllRanges(); s.addRange(r); }
+
+  function buildTableRow(it) {
+    const row = document.createElement("div"); row.className = "gc-item gc-item-table"; it._row = row;
+    const head = document.createElement("div"); head.className = "gc-thead-row";
+    const sel = document.createElement("select"); sel.className = "gc-reg"; sel.setAttribute("aria-label", "Regression model");
+    [["none", "No fit"], ["linear", "Linear"], ["quadratic", "Quadratic"], ["cubic", "Cubic"], ["exponential", "Exponential"], ["power", "Power"], ["logarithmic", "Log"]].forEach(([v, l]) => { const o = document.createElement("option"); o.value = v; o.textContent = l; sel.appendChild(o); });
+    sel.value = it.reg; sel.addEventListener("change", () => { it.reg = sel.value; redraw(); });
+    const cap = document.createElement("span"); cap.className = "gc-tcap"; cap.textContent = "Table";
+    head.append(colorChip(it), cap, sel, delBtn(it));
+    const tbl = document.createElement("div"); tbl.className = "gc-tbl"; it._tbl = tbl;
+    function tInput(r, i, c) {
+      const el = document.createElement("input"); el.type = "text"; el.value = it.rows[i][c]; el.placeholder = c === 0 ? "x" : "y"; el.className = "gc-tinp"; el.autocomplete = "off";
+      el.setAttribute("aria-label", (c === 0 ? "x" : "y") + " value, row " + (i + 1));
+      el.addEventListener("focus", () => { activeEl = el; clearTimeout(hideTimer); });
+      el.addEventListener("blur", () => { hideTimer = setTimeout(() => { if (!wrap.contains(document.activeElement)) hideKeyboard(); }, 200); });
+      el.addEventListener("input", () => { it.rows[i][c] = el.value; redraw(); });
+      el.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === "Tab") { e.preventDefault(); tableNext(it, i, c); } });
+      return el;
+    }
+    function renderRows() {
+      tbl.innerHTML = "";
+      it.rows.forEach((r, i) => {
+        const rr = document.createElement("div"); rr.className = "gc-trow";
+        rr.append(tInput(r, i, 0), tInput(r, i, 1));
+        const del = document.createElement("button"); del.className = "gc-del sm"; del.textContent = "\u00d7"; del.setAttribute("aria-label", "Delete row " + (i + 1));
+        del.addEventListener("click", (e) => { e.stopPropagation(); it.rows.splice(i, 1); if (!it.rows.length) it.rows.push(["", ""]); renderRows(); redraw(); });
+        rr.appendChild(del); tbl.appendChild(rr);
+      });
+      const add = document.createElement("button"); add.className = "gc-tadd"; add.textContent = "+ row";
+      add.addEventListener("click", (e) => { e.stopPropagation(); it.rows.push(["", ""]); renderRows(); }); tbl.appendChild(add);
+    }
+    it._renderRows = renderRows; renderRows();
+    const readout = document.createElement("div"); readout.className = "gc-reg-readout"; it._readout = readout;
+    row.append(head, tbl, readout);
+    return row;
+  }
+  function tableNext(it, rowIdx, col) {
+    if (col === 0) { focusCell(it, rowIdx, 1); return; }
+    if (rowIdx < it.rows.length - 1) { focusCell(it, rowIdx + 1, 0); return; }
+    it.rows.push(["", ""]); it._renderRows(); redraw(); focusCell(it, it.rows.length - 1, 0);
+  }
+  function focusCell(it, rowIdx, col) { const rowEls = it._tbl.querySelectorAll(".gc-trow"); const rowEl = rowEls[rowIdx]; if (!rowEl) return; const inp = rowEl.querySelectorAll(".gc-tinp")[col]; if (inp) inp.focus(); }
+
+  function removeItem(it) { const el = it._row; if (el && el.parentNode) el.parentNode.removeChild(el); items = items.filter((x) => x !== it); if (!items.length) { const ne = newExpr(""); items.push(ne); listEl.appendChild(buildExprRow(ne)); } redraw(); }
+  function renderList() {
+    listEl.innerHTML = "";
+    items.forEach((it, i) => listEl.appendChild(it.kind === "expr" ? buildExprRow(it, i === 0 && !it.text ? "y = x\u00b2  or  (2, 3)" : "") : buildTableRow(it)));
+  }
+
+  // ---------- on-screen keyboard ----------
+  let activeEl = null, hideTimer = null;
+  const KB = [
+    [["x", "x"], ["y", "y"], ["(", "("], [")", ")"], ["x\u02b8", "^"], ["\u232b", "back"]],
+    [["7", "7"], ["8", "8"], ["9", "9"], ["\u00f7", "/"], ["\u221a", "sqrt("], ["\u03c0", "\u03c0"]],
+    [["4", "4"], ["5", "5"], ["6", "6"], ["\u00d7", "*"], ["sin", "sin("], ["cos", "cos("]],
+    [["1", "1"], ["2", "2"], ["3", "3"], ["\u2212", "-"], ["tan", "tan("], ["ln", "ln("]],
+    [["0", "0"], [".", "."], [",", ","], ["+", "+"], ["=", "="], ["e", "e"]],
+    [["<", "<"], [">", ">"], ["\u2264", "<="], ["\u2265", ">="], ["log", "log("], ["|x|", "abs("]],
+  ];
+  function buildKeyboard() {
+    const head = document.createElement("div"); head.className = "gc-kb-head"; head.innerHTML = "<span>Keyboard</span>";
+    const hide = document.createElement("button"); hide.className = "gc-kb-hide"; hide.textContent = "\u2715"; hide.setAttribute("aria-label", "Hide keyboard");
+    hide.addEventListener("pointerdown", (e) => { e.preventDefault(); e.stopPropagation(); hideKeyboard(); if (activeEl) activeEl.blur(); });
+    head.appendChild(hide); kbEl.appendChild(head);
+    KB.forEach((rowKeys) => {
+      const r = document.createElement("div"); r.className = "gc-kb-row";
+      rowKeys.forEach(([label, ins]) => {
+        const k = document.createElement("button"); k.className = "gc-key"; k.textContent = label;
+        k.addEventListener("pointerdown", (e) => { e.preventDefault(); e.stopPropagation(); pressKey(ins); });
+        r.appendChild(k);
+      });
+      kbEl.appendChild(r);
+    });
+  }
+  function pressKey(ins) {
+    const el = activeEl; if (!el) return;
+    const editable = el.isContentEditable;
+    if (ins === "back") {
+      if (editable) {
+        if (document.execCommand) document.execCommand("delete", false, null);
+        else { // fallback if execCommand is ever removed
+          const sel = window.getSelection();
+          if (sel.rangeCount) { const r = sel.getRangeAt(0); if (r.collapsed && r.startOffset > 0 && r.startContainer.nodeType === 3) r.setStart(r.startContainer, r.startOffset - 1); r.deleteContents(); }
+        }
+        el.dispatchEvent(new Event("input")); el.focus(); return;
+      }
+      const s = el.selectionStart, e = el.selectionEnd; if (s !== e) { el.value = el.value.slice(0, s) + el.value.slice(e); el.setSelectionRange(s, s); } else if (s > 0) { el.value = el.value.slice(0, s - 1) + el.value.slice(s); el.setSelectionRange(s - 1, s - 1); }
+    } else if (ins === "^" && editable) { enterSup(el); }
+    else if (ins === "/" && editable) { insertFraction(el); }
+    else if (editable) { insertCE(el, ins); }
+    else { const s = el.selectionStart, e = el.selectionEnd; el.value = el.value.slice(0, s) + ins + el.value.slice(e); const c = s + ins.length; el.setSelectionRange(c, c); }
+    el.dispatchEvent(new Event("input")); el.focus();
+  }
+  function showKeyboard() { kbEl.classList.add("open"); }
+  function hideKeyboard() { kbEl.classList.remove("open"); }
+
+  // ---------- pan / zoom / pinch / click (with smart snapping) ----------
+  let dragging = false, moved = false, lastX = 0, lastY = 0, downX = 0, downY = 0;
+  const touches = new Map();
+  let pinch = null;
+  canvas.addEventListener("pointerdown", (e) => {
+    canvas.setPointerCapture(e.pointerId);
+    touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (touches.size === 2) { // start pinch: freeze pan, suppress tap
+      const [a, b] = [...touches.values()];
+      pinch = { d0: Math.max(10, Math.hypot(a.x - b.x, a.y - b.y)), ppu0: ppu };
+      dragging = false; moved = true;
+    } else if (touches.size === 1) {
+      dragging = true; moved = false; lastX = downX = e.clientX; lastY = downY = e.clientY;
+    }
+  });
+  canvas.addEventListener("pointermove", (e) => {
+    if (touches.has(e.pointerId)) touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (pinch && touches.size === 2) {
+      const [a, b] = [...touches.values()];
+      const rect = canvas.getBoundingClientRect();
+      const mx = (a.x + b.x) / 2 - rect.left, my = (a.y + b.y) / 2 - rect.top;
+      const wx = s2dx(mx), wy = s2dy(my);            // world point under pinch center (old transform)
+      const d = Math.max(10, Math.hypot(a.x - b.x, a.y - b.y));
+      ppu = clamp(pinch.ppu0 * d / pinch.d0, 2, 6000);
+      cx = wx - (mx - W / 2) / ppu; cy = wy + (my - H / 2) / ppu;
+      redraw(); return;
+    }
+    if (!dragging) return;
+    if (Math.abs(e.clientX - downX) > 3 || Math.abs(e.clientY - downY) > 3) moved = true;
+    if (moved) { cx -= (e.clientX - lastX) / ppu; cy += (e.clientY - lastY) / ppu; lastX = e.clientX; lastY = e.clientY; redraw(); }
+  });
+  canvas.addEventListener("pointerup", (e) => {
+    touches.delete(e.pointerId);
+    if (touches.size < 2) pinch = null;
+    const wasDragging = dragging; dragging = false;
+    if (wasDragging && !moved) handleClick(e);
+  });
+  canvas.addEventListener("pointercancel", (e) => { touches.delete(e.pointerId); if (touches.size < 2) pinch = null; dragging = false; });
+  canvas.addEventListener("wheel", (e) => { e.preventDefault(); const rect = canvas.getBoundingClientRect(); const mx = e.clientX - rect.left, my = e.clientY - rect.top; const bx = s2dx(mx), by = s2dy(my); ppu = clamp(ppu * (e.deltaY < 0 ? 1.15 : 1 / 1.15), 2, 6000); cx = bx - (mx - W / 2) / ppu; cy = by + (my - H / 2) / ppu; redraw(); }, { passive: false });
+  function handleClick(e) {
+    const rect = canvas.getBoundingClientRect(); const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    // smart snap: named features from function items first
+    const funcs = items.filter((it) => it.visible && it._an && it._an.kind === "func").map((it) => it._an.f);
+    let snap = null, snapD = 17 * 17;
+    if (funcs.length) {
+      const feats = gcFindFeatures(funcs, s2dx(0), s2dx(W));
+      feats.forEach((ft) => { const dx = d2sx(ft.x) - mx, dy = d2sy(ft.y) - my; const d = dx * dx + dy * dy; if (d < snapD) { snapD = d; snap = { x: ft.x, y: ft.y, type: ft.type }; } });
+    }
+    if (snap) { readoutPt = snap; redraw(); return; }
+    let best = null, bestD = 13 * 13;
+    markStore.forEach((p) => { const d = (p.sx - mx) * (p.sx - mx) + (p.sy - my) * (p.sy - my); if (d < bestD) { bestD = d; best = { x: p.x, y: p.y }; } });
+    segStore.forEach((p) => { const d = (p.sx - mx) * (p.sx - mx) + (p.sy - my) * (p.sy - my); if (d < bestD) { bestD = d; best = { x: s2dx(p.sx), y: s2dy(p.sy) }; } });
+    readoutPt = best; redraw();
+  }
+
+  // ---------- controls ----------
+  wrap.querySelector(".gc-side").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-gc]"); if (!b) return;
+    if (b.dataset.gc === "add-expr") { const ne = newExpr(""); items.push(ne); listEl.appendChild(buildExprRow(ne)); ne._field.focus(); }
+    else if (b.dataset.gc === "add-table") { const nt = newTable(); items.push(nt); listEl.appendChild(buildTableRow(nt)); redraw(); }
+    else if (b.dataset.gc === "kbd") { e.stopPropagation(); kbEl.classList.toggle("open"); }
+  });
+  wrap.querySelector(".gc-titlebar").addEventListener("click", (e) => { if (e.target.closest('[data-gc="settings"]')) { e.stopPropagation(); settingsEl.classList.toggle("open"); } });
+  settingsEl.querySelectorAll("input").forEach((inp) => inp.addEventListener("input", () => { const v = parseFloat(inp.value); const val = isFinite(v) && v > 0 ? v : null; if (inp.dataset.ax === "x") stepX = val; else stepY = val; redraw(); }));
+  const zoom = plotEl.querySelector(".gc-zoom");
+  zoom.addEventListener("click", (e) => { const b = e.target.closest("[data-gc]"); if (!b) return; e.stopPropagation(); if (b.dataset.gc === "reset") { defaultView(); readoutPt = null; redraw(); } else ppu = clamp(ppu * (b.dataset.gc === "zin" ? 1.25 : 0.8), 2, 6000), redraw(); });
+
+  buildKeyboard();
+  renderList();
+
+  // draggable divider to widen the equation sidebar (wide layout only)
+  const sideEl = wrap.querySelector(".gc-side"), dividerEl = wrap.querySelector(".gc-divider");
+  let dragW = false, dw0 = 0, dwStart = 0;
+  dividerEl.addEventListener("pointerdown", (e) => { e.preventDefault(); dividerEl.setPointerCapture(e.pointerId); dragW = true; dw0 = e.clientX; dwStart = sideEl.getBoundingClientRect().width; });
+  dividerEl.addEventListener("pointermove", (e) => { if (!dragW) return; const total = wrap.querySelector(".gc-main").getBoundingClientRect().width; const w = clamp(dwStart + (e.clientX - dw0), 150, total - 160); sideEl.style.width = w + "px"; redraw(); });
+  const stopDivider = () => { dragW = false; };
+  dividerEl.addEventListener("pointerup", stopDivider);
+  dividerEl.addEventListener("pointercancel", stopDivider);
+
+  // responsive: stack vertically in narrow embeds, and redraw on any resize
+  const ro = new ResizeObserver(() => {
+    wrap.classList.toggle("narrow", wrap.clientWidth < 520);
+    redraw();
+  });
+  ro.observe(plotEl);
+  ro.observe(wrap);
+
+  requestAnimationFrame(() => {
+    if (presetWin) {
+      const [x0, x1, y0, y1] = presetWin;
+      W = plotEl.clientWidth || 300; H = plotEl.clientHeight || 300;
+      cx = (x0 + x1) / 2; cy = (y0 + y1) / 2;
+      ppu = clamp(Math.min(W / (x1 - x0), H / (y1 - y0)), 2, 6000);
+    } else {
+      defaultView();
+    }
+    if (qs.get("kbd") === "1") showKeyboard();
+    redraw();
+  });
+})();
+</script>
+</body>
+</html>
