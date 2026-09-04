@@ -1,0 +1,1633 @@
+<title>Tube Runner</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Mono:wght@400;700&display=swap">
+<style>
+  :root{
+    --bg:#040308;
+    --text:#eaf4ff;
+    --muted:#6f7ba0;
+    --panel:#0a0e1c;
+    --panel-border:#2c3560;
+    --ship:#4be3ff;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Space Mono',ui-monospace,monospace;
+    overflow:hidden;
+    -webkit-user-select:none;
+    user-select:none;
+    touch-action:none;
+  }
+  #game{ position:fixed; inset:0; display:block; width:100vw; height:100vh; background:#040308; }
+  #hud{
+    position:fixed; inset:0; pointer-events:none;
+    padding:18px 22px;
+    display:flex; justify-content:space-between; align-items:flex-start;
+    font-size:13px; letter-spacing:1px;
+  }
+  #hud .col{display:flex;flex-direction:column;gap:6px;}
+  #hud .label{color:var(--muted);font-size:10px;letter-spacing:2px;}
+  #hud .value{color:var(--text);font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;text-shadow:0 0 8px rgba(234,244,255,.35);}
+  #hud .col.right{align-items:flex-end;}
+  #level-badge{
+    position:fixed; top:18px; left:50%; transform:translateX(-50%);
+    text-align:center; pointer-events:none;
+  }
+  #level-badge .lv{color:var(--muted);font-size:11px;letter-spacing:3px;}
+  #level-badge .lv b{font-size:14px;text-shadow:0 0 8px currentColor;}
+  #level-badge .set{font-size:9px;letter-spacing:2px;margin-top:2px;}
+  #zap-meter{display:flex;gap:4px;margin-top:8px;justify-content:center;}
+  .zap-pip{width:16px;height:6px;border-radius:2px;background:rgba(255,255,255,.12);}
+  .zap-pip.on{background:#ffd23f;box-shadow:0 0 6px #ffd23f;}
+  #lives{display:flex;gap:6px;}
+  #overlay{
+    position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+    background:rgba(2,2,8,.72); backdrop-filter:blur(2px);
+  }
+  #overlay[hidden]{display:none;}
+  .panel{
+    width:min(520px,90vw);
+    background:linear-gradient(180deg,var(--panel),#060814);
+    border:1px solid var(--panel-border); border-radius:4px;
+    padding:34px 30px 28px; text-align:center;
+    box-shadow:0 0 0 1px rgba(75,227,255,.08), 0 0 46px rgba(75,227,255,.14), 0 24px 60px rgba(0,0,0,.55);
+    max-height:88vh; overflow-y:auto;
+  }
+  .panel h1{
+    font-family:'Press Start 2P',monospace;
+    font-size:clamp(16px,3.6vw,24px); line-height:1.5; margin:0 0 12px;
+    color:var(--ship); text-shadow:0 0 12px rgba(75,227,255,.55), 0 0 32px rgba(75,227,255,.3);
+    text-wrap:balance;
+  }
+  .panel h1.warn{color:#ff2d3a;text-shadow:0 0 12px rgba(255,45,58,.6);}
+  .panel .sub{color:var(--muted);font-size:12px;letter-spacing:1px;margin-bottom:18px;}
+  .panel .sub.credit-line{margin-top:-12px;font-size:10.5px;font-style:italic;opacity:.85;}
+  .panel .stat-row{display:flex;justify-content:center;gap:24px;margin:16px 0;flex-wrap:wrap;}
+  .panel .stat{display:flex;flex-direction:column;gap:4px;min-width:64px;}
+  .panel .stat .n{font-size:20px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;}
+  .panel .stat .l{font-size:9px;color:var(--muted);letter-spacing:2px;}
+  .controls{
+    text-align:left; display:grid; grid-template-columns:auto 1fr; gap:6px 14px;
+    font-size:11px; color:var(--muted); margin:16px 0 6px; padding:14px 16px;
+    background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06); border-radius:3px;
+  }
+  .controls kbd{
+    color:var(--ship); background:rgba(75,227,255,.08); border:1px solid rgba(75,227,255,.35);
+    border-radius:3px; padding:1px 6px; font-family:'Space Mono',monospace; font-size:10px; justify-self:start;
+  }
+  .enemy-key{display:flex;flex-wrap:wrap;gap:10px 16px;justify-content:center;font-size:10px;color:var(--muted);margin:14px 0;}
+  .enemy-key span{display:flex;align-items:center;gap:5px;}
+  .enemy-key i{display:inline-block;width:10px;height:10px;border-radius:2px;}
+  #start-btn{
+    margin-top:16px; background:transparent; border:1px solid var(--ship); color:var(--ship);
+    font-family:'Space Mono',monospace; font-weight:700; letter-spacing:2px; font-size:13px;
+    padding:10px 22px; border-radius:3px; cursor:pointer; pointer-events:auto;
+  }
+  #start-btn:hover{background:rgba(75,227,255,.12);}
+  #start-btn:focus-visible{outline:2px solid #ffd23f;outline-offset:2px;}
+  .credit{margin-top:14px;font-size:9px;color:#3d456e;letter-spacing:1px;}
+
+  .egg-banner{
+    margin:18px 0 4px; padding:14px 14px 16px; border-radius:4px;
+    background:rgba(255,210,63,.06); border:1px solid rgba(255,210,63,.4);
+    box-shadow:0 0 22px rgba(255,210,63,.12) inset;
+  }
+  .egg-title{
+    font-family:'Press Start 2P',monospace; font-size:11px; letter-spacing:1px;
+    color:#ffd23f; text-shadow:0 0 10px rgba(255,210,63,.6); margin-bottom:8px;
+    animation:egg-pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes egg-pulse{ 0%,100%{opacity:1;} 50%{opacity:.55;} }
+  .egg-sub{font-size:10.5px;color:var(--muted);letter-spacing:.4px;margin-bottom:12px;}
+  .egg-levels{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
+  .egg-btn{
+    background:transparent; border:1px solid #ffd23f; color:#ffd23f;
+    font-family:'Space Mono',monospace; font-weight:700; letter-spacing:1px; font-size:11.5px;
+    padding:8px 12px; border-radius:3px; cursor:pointer; pointer-events:auto;
+  }
+  .egg-btn:hover{background:rgba(255,210,63,.15);}
+  .egg-btn:focus-visible{outline:2px solid #4be3ff;outline-offset:2px;}
+
+  #touch-controls{
+    position:fixed; inset:auto 0 0 0; display:none; justify-content:space-between;
+    padding:0 16px 18px; pointer-events:none;
+  }
+  #touch-controls.active{display:flex;}
+  .tc-group{display:flex;gap:10px;pointer-events:auto;}
+  .tc-btn{
+    width:56px;height:56px;border-radius:50%;border:1px solid rgba(75,227,255,.4);
+    background:rgba(10,14,28,.55);color:var(--ship);font-size:17px;
+    display:flex;align-items:center;justify-content:center;-webkit-user-select:none;user-select:none;
+  }
+  .tc-btn:active{background:rgba(75,227,255,.25);}
+  #zap-btn{border-color:rgba(255,210,63,.5);color:#ffd23f;font-size:9px;letter-spacing:1px;}
+  #zap-btn:active{background:rgba(255,210,63,.25);}
+  @media (max-width:640px){ #hud{font-size:11px;padding:12px 14px;} #hud .value{font-size:15px;} }
+
+  #bonus-banner{
+    position:fixed; top:36%; left:50%; z-index:5;
+    transform:translate(-50%,-50%) scale(.6);
+    font-family:'Press Start 2P',monospace;
+    font-size:clamp(16px,4vw,28px); text-align:center; line-height:1.7;
+    color:#ffd23f; text-shadow:0 0 14px rgba(255,210,63,.7), 0 0 40px rgba(255,210,63,.4);
+    pointer-events:none; opacity:0;
+    transition:opacity .25s ease, transform .25s ease;
+  }
+  #bonus-banner.show{ opacity:1; transform:translate(-50%,-50%) scale(1); }
+  #bonus-banner .lbl{ display:block; font-size:.55em; color:#eaf4ff; letter-spacing:2px; margin-bottom:6px; }
+</style>
+
+<canvas id="game" aria-label="Tube Runner game canvas"></canvas>
+
+<div id="hud" hidden>
+  <div class="col left">
+    <div class="label">SCORE</div>
+    <div class="value" id="score-val">000000</div>
+    <div class="label" style="margin-top:8px;">BEST (session)</div>
+    <div class="value" id="best-val" style="font-size:12px;color:var(--muted);">000000</div>
+  </div>
+  <div class="col right">
+    <div class="label">SHIPS</div>
+    <div id="lives"></div>
+  </div>
+</div>
+<div id="level-badge" hidden>
+  <div class="lv">LEVEL <b id="level-val">1</b></div>
+  <div class="set" id="set-val">NAVY &middot; CIRCLE</div>
+  <div id="zap-meter"><div class="zap-pip" id="zap-pip-0"></div><div class="zap-pip" id="zap-pip-1"></div></div>
+</div>
+
+<div id="overlay">
+  <div class="panel" id="panel-title">
+    <h1>TUBE RUNNER</h1>
+    <div class="sub">an homage to Atari's Tempest (1981)</div>
+    <div class="sub credit-line">John Reed's favorite arcade game as a child</div>
+    <div class="controls">
+      <kbd>&larr; &rarr;</kbd><span>rotate around the rim</span>
+      <kbd>wheel</kbd><span>rotate (scroll up/down)</span>
+      <kbd>SPACE</kbd><span>fire (or left-click)</span>
+      <kbd>Z</kbd><span>superzapper (or right-click)</span>
+      <kbd>P</kbd><span>pause</span>
+    </div>
+    <div class="enemy-key">
+      <span><i style="background:#ff5bd0;"></i>Flipper</span>
+      <span><i style="background:#ff9d3d;"></i>Tanker</span>
+      <span><i style="background:#b565f5;"></i>Spiker</span>
+      <span><i style="background:#fff7d6;"></i>Fuseball</span>
+      <span><i style="background:#9fe8ff;"></i>Pulsar (lvl 14+)</span>
+    </div>
+    <div style="font-size:11px;color:var(--muted);">Clear every enemy climbing the tube before they reach your rim. 13 shapes, endless levels, 5 ships. No survivors.</div>
+    <button id="start-btn">DROP IN</button>
+    <div class="credit" id="title-best"></div>
+  </div>
+</div>
+
+<div id="bonus-banner" hidden></div>
+
+<div id="touch-controls">
+  <div class="tc-group">
+    <div class="tc-btn" id="tc-left">&#9664;</div>
+    <div class="tc-btn" id="tc-right">&#9654;</div>
+  </div>
+  <div class="tc-group">
+    <div class="tc-btn" id="zap-btn">ZAP</div>
+    <div class="tc-btn" id="fire-btn">FIRE</div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+// =====================================================================
+// canvas / sizing
+// =====================================================================
+var canvas = document.getElementById('game');
+var ctx = canvas.getContext('2d');
+var W = window.innerWidth, H = window.innerHeight, DPR = Math.min(window.devicePixelRatio||1,2);
+var scale = 1;
+function resize(){
+  W = window.innerWidth; H = window.innerHeight;
+  DPR = Math.min(window.devicePixelRatio||1,2);
+  canvas.width = Math.floor(W*DPR); canvas.height = Math.floor(H*DPR);
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  scale = Math.max(0.55, Math.min(1.5, Math.min(W,H)/900));
+}
+window.addEventListener('resize', resize);
+resize();
+var TWO_PI = Math.PI*2;
+function norm(a){ a=a%TWO_PI; if(a<0) a+=TWO_PI; return a; }
+function lerp(a,b,t){ return a+(b-a)*t; }
+function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
+
+// =====================================================================
+// tiny synth audio (no assets)
+// =====================================================================
+var actx=null;
+function ensureAudio(){
+  if(!actx){ try{ actx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ actx=null; } }
+  else if(actx.state==='suspended'){ actx.resume().catch(function(){}); }
+}
+function tone(freq,dur,type,gain,sweepTo){
+  if(!actx) return;
+  try{
+    var t0=actx.currentTime;
+    var osc=actx.createOscillator(), g=actx.createGain();
+    osc.type=type||'square';
+    osc.frequency.setValueAtTime(freq,t0);
+    if(sweepTo) osc.frequency.linearRampToValueAtTime(sweepTo,t0+dur);
+    g.gain.setValueAtTime(gain==null?0.12:gain,t0);
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+    osc.connect(g).connect(actx.destination);
+    osc.start(t0); osc.stop(t0+dur+0.02);
+  }catch(e){}
+}
+function noiseBurst(dur,gain,freq){
+  if(!actx) return;
+  try{
+    var t0=actx.currentTime;
+    var n=Math.floor(actx.sampleRate*dur);
+    var buf=actx.createBuffer(1,n,actx.sampleRate), data=buf.getChannelData(0);
+    for(var i=0;i<n;i++) data[i]=(Math.random()*2-1)*(1-i/n);
+    var src=actx.createBufferSource(); src.buffer=buf;
+    var g=actx.createGain(); g.gain.setValueAtTime(gain==null?0.16:gain,t0); g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+    var filt=actx.createBiquadFilter(); filt.type='lowpass'; filt.frequency.value=freq||1800;
+    src.connect(filt).connect(g).connect(actx.destination);
+    src.start(t0);
+  }catch(e){}
+}
+var sfx = {
+  shoot:function(){ tone(680,0.05,'square',0.05,900); },
+  hit:function(){ tone(240,0.06,'square',0.07,120); },
+  flipperDie:function(){ tone(320,0.1,'sawtooth',0.08,80); },
+  tankerSplit:function(){ noiseBurst(0.15,0.12); tone(300,0.12,'square',0.07,150); },
+  fuseDie:function(){ noiseBurst(0.12,0.1,2400); },
+  spikeHit:function(){ tone(180,0.05,'square',0.06,90); },
+  pulse:function(){ tone(90,0.5,'sawtooth',0.09,50); },
+  zap:function(){ noiseBurst(0.5,0.22,4000); tone(1200,0.4,'sawtooth',0.1,60); },
+  capture:function(){ noiseBurst(0.5,0.2); tone(200,0.55,'sawtooth',0.1,30); },
+  levelClear:function(){ [523,659,784,1047].forEach(function(f,i){ setTimeout(function(){tone(f,0.16,'square',0.08);},i*90); }); },
+  warp:function(){ tone(120,1.1,'sine',0.08,1400); },
+  warpCrack:function(){ noiseBurst(0.28,0.4,900); tone(70,0.3,'sawtooth',0.22,28); },
+  bigBonus:function(){ [392,523,659,784,988,1244].forEach(function(f,i){ setTimeout(function(){tone(f,0.18,'square',0.09);},i*70); }); },
+  gameover:function(){ tone(280,0.7,'sawtooth',0.1,60); }
+};
+
+// =====================================================================
+// input: keyboard + mouse wheel + click + touch, all live simultaneously
+// =====================================================================
+var keys = {left:false,right:false,fire:false,zap:false};
+window.addEventListener('keydown', function(e){
+  if(['ArrowLeft','ArrowRight','Space','KeyA','KeyD','KeyZ'].indexOf(e.code)!==-1) e.preventDefault();
+  if(e.code==='ArrowLeft'||e.code==='KeyA') keys.left=true;
+  if(e.code==='ArrowRight'||e.code==='KeyD') keys.right=true;
+  if(e.code==='Space') keys.fire=true;
+  if(e.code==='KeyZ') keys.zap=true;
+  if(e.code==='KeyP'||e.code==='Escape') togglePause();
+  if(e.code==='Enter') handleEnter();
+});
+window.addEventListener('keyup', function(e){
+  if(e.code==='ArrowLeft'||e.code==='KeyA') keys.left=false;
+  if(e.code==='ArrowRight'||e.code==='KeyD') keys.right=false;
+  if(e.code==='Space') keys.fire=false;
+  if(e.code==='KeyZ') keys.zap=false;
+});
+window.addEventListener('wheel', function(e){
+  e.preventDefault();
+  if(!tube) return;
+  // rotation also works through the first half of the warp animation (see
+  // updateWarpHazards) so the player can still dodge a leftover hazard
+  if(state!=='playing' && !(state==='warp' && !warpSwapped)) return;
+  // the wheel moves player.laneF directly, outside the normal update()/
+  // updateWarpHazards() calls — which means it was the one input that kept
+  // working even during a hazard-death freeze, silently repositioning the
+  // ship while everything else (including arrow-key rotation) correctly
+  // held still. Block it too, so "frozen" actually means frozen.
+  if(deathFreezeT>0 || warpFreezeT>0) return;
+  // deltaMode varies by browser/device: 0=pixels (~100-120/notch), 1=lines (~1-3/notch), 2=pages.
+  // Without normalizing, line-mode wheels (common on Windows/Firefox) barely register.
+  var mult = e.deltaMode===1 ? 18 : (e.deltaMode===2 ? window.innerHeight : 1);
+  // some mice/trackballs report motion on deltaX instead of deltaY (a
+  // horizontal-only wheel, a tilt-wheel, a shift-scroll gesture) — fall
+  // back to deltaX so those devices still rotate the ship
+  var rawDelta = e.deltaY!==0 ? e.deltaY : e.deltaX;
+  if(rawDelta===0) return; // nothing actually moved — see the bug this avoids below
+  var d = rawDelta*mult;
+  // snap to a WHOLE number of lanes each notch. A fractional step (e.g. 1.11 lanes)
+  // looks harmless but drifts: repeated notches eventually round to a +2 jump instead
+  // of +1, which makes the skipped lane in between unreachable by wheel. Also: with
+  // plain `e.deltaY`, a zero-delta event (deltaY===0) made `d>0?1:-1` silently default
+  // to -1 — forcing a phantom step in one fixed direction on every such event, which
+  // could look like the ship refusing to move (or only ever drifting one way) on a
+  // device that emits them. Bailing out above when rawDelta is 0 fixes that.
+  var steps = (d>0?1:-1) * Math.max(1, Math.min(3, Math.round(Math.abs(d)/90)));
+  var cur = Math.round(player.laneF);
+  player.laneF = boundLaneF(cur + steps);
+  wheelActivity = true;
+}, {passive:false});
+canvas.addEventListener('mousedown', function(e){
+  ensureAudio();
+  if(e.button===0) keys.fire=true;
+  if(e.button===2) keys.zap=true;
+});
+window.addEventListener('mouseup', function(e){
+  if(e.button===0) keys.fire=false;
+  if(e.button===2) keys.zap=false;
+});
+canvas.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+
+function bindHold(el,onDown,onUp){
+  if(!el) return;
+  el.addEventListener('pointerdown', function(ev){ ev.preventDefault(); onDown(); });
+  el.addEventListener('pointerup', function(ev){ ev.preventDefault(); onUp(); });
+  el.addEventListener('pointerleave', function(ev){ onUp(); });
+  el.addEventListener('pointercancel', function(ev){ onUp(); });
+}
+if('ontouchstart' in window || navigator.maxTouchPoints>0){
+  document.getElementById('touch-controls').classList.add('active');
+}
+bindHold(document.getElementById('tc-left'), function(){keys.left=true;}, function(){keys.left=false;});
+bindHold(document.getElementById('tc-right'), function(){keys.right=true;}, function(){keys.right=false;});
+bindHold(document.getElementById('fire-btn'), function(){keys.fire=true;}, function(){keys.fire=false;});
+bindHold(document.getElementById('zap-btn'), function(){keys.zap=true;}, function(){keys.zap=false;});
+
+// =====================================================================
+// shape library. "corners" shapes are resampled to N points at equal arc
+// length; "radial" shapes are sampled directly from a parametric angle
+// function. openCap=true means the shape is a genuinely open tube (like
+// Tempest's U/V-style levels): the path has two real ends with nothing
+// connecting them — no lane there, no wall drawn, and neither the player
+// nor enemies can cross between the two ends. A closed shape has N points
+// and N lanes (wrapping); an open shape has N points but only N-1 lanes
+// (the two endpoints are never connected to each other).
+// =====================================================================
+function sampleOpenPolyline(corners, N){
+  var segs = [], total = 0;
+  for(var i=0;i<corners.length-1;i++){
+    var a = corners[i], b = corners[i+1];
+    var d = Math.hypot(b[0]-a[0], b[1]-a[1]);
+    segs.push({a:a,b:b,len:d});
+    total += d;
+  }
+  var step = total/(N-1);
+  var out = [];
+  for(var k=0;k<N;k++){
+    var target = Math.min(total, k*step);
+    var acc=0, chosen=segs[segs.length-1], localT=1;
+    for(var s=0;s<segs.length;s++){
+      if(acc+segs[s].len >= target || s===segs.length-1){
+        chosen = segs[s];
+        localT = segs[s].len>0 ? (target-acc)/segs[s].len : 0;
+        break;
+      }
+      acc += segs[s].len;
+    }
+    out.push({ x: lerp(chosen.a[0],chosen.b[0],localT), y: lerp(chosen.a[1],chosen.b[1],localT) });
+  }
+  return out;
+}
+// Plain arc-length resampling (sampleOpenPolyline/sampleClosedPolyline below)
+// redistributes points evenly along total length WITHOUT regard for where
+// the original corners fall — so a sample interval that straddles a real
+// corner gets rendered as a straight chord cutting across it, turning a true
+// 90° turn into a shallow diagonal. This variant guarantees every original
+// corner is kept as an exact sample point, and only adds extra points
+// strictly inside a single segment (so they can never introduce a new angle).
+function sampleOpenPolylineKeepCorners(corners, N){
+  var segs = [], total = 0;
+  for(var i=0;i<corners.length-1;i++){
+    var a=corners[i], b=corners[i+1];
+    var d=Math.hypot(b[0]-a[0], b[1]-a[1]);
+    segs.push({a:a,b:b,len:d});
+    total += d;
+  }
+  var extra = Math.max(0, N - corners.length);
+  var out = [];
+  for(var s=0;s<segs.length;s++){
+    out.push({x:segs[s].a[0], y:segs[s].a[1]});
+    var share = total>0 ? segs[s].len/total : 0;
+    var insertCount = Math.round(share*extra);
+    for(var k=1;k<=insertCount;k++){
+      var t = k/(insertCount+1);
+      out.push({ x: lerp(segs[s].a[0],segs[s].b[0],t), y: lerp(segs[s].a[1],segs[s].b[1],t) });
+    }
+  }
+  out.push({x:corners[corners.length-1][0], y:corners[corners.length-1][1]});
+  return out;
+}
+function sampleClosedPolyline(corners, N){
+  var segs = [];
+  var total = 0;
+  for(var i=0;i<corners.length;i++){
+    var a = corners[i], b = corners[(i+1)%corners.length];
+    var d = Math.hypot(b[0]-a[0], b[1]-a[1]);
+    segs.push({a:a,b:b,len:d});
+    total += d;
+  }
+  var step = total/N;
+  var out = [];
+  var segIdx = 0, segPos = 0;
+  for(var k=0;k<N;k++){
+    var target = k*step;
+    var acc = 0, chosen = segs[0], localT = 0;
+    for(var s=0;s<segs.length;s++){
+      if(acc+segs[s].len >= target || s===segs.length-1){
+        chosen = segs[s];
+        localT = segs[s].len>0 ? (target-acc)/segs[s].len : 0;
+        break;
+      }
+      acc += segs[s].len;
+    }
+    out.push({ x: lerp(chosen.a[0],chosen.b[0],localT), y: lerp(chosen.a[1],chosen.b[1],localT) });
+  }
+  return out;
+}
+function starCorners(){
+  var pts=[];
+  for(var i=0;i<10;i++){
+    var r = (i%2===0) ? 1.0 : 0.42;
+    var a = -Math.PI/2 + i*(TWO_PI/10);
+    pts.push([r*Math.cos(a), r*Math.sin(a)]);
+  }
+  return pts;
+}
+var SHAPE_LIB = {
+  circle:      { type:'radial', N:16, openCap:false, fn:function(t){ return {x:Math.cos(t), y:Math.sin(t)}; } },
+  square:      { type:'corners', N:16, openCap:false, corners:[[-1,-1],[1,-1],[1,1],[-1,1]] },
+  cross:       { type:'corners', N:16, openCap:false, corners:[[-0.35,-1],[0.35,-1],[0.35,-0.35],[1,-0.35],[1,0.35],[0.35,0.35],[0.35,1],[-0.35,1],[-0.35,0.35],[-1,0.35],[-1,-0.35],[-0.35,-0.35]] },
+  pinchedOval: { type:'radial', N:16, openCap:false, fn:function(t){ var bx=Math.cos(t); var f=1-0.45*Math.exp(-6*bx*bx); return {x:bx, y:Math.sin(t)*0.55*f}; } },
+  smoothCross: { type:'radial', N:16, openCap:false, fn:function(t){ var r=0.55+0.35*Math.pow(Math.abs(Math.cos(2*t)),0.7); return {x:r*Math.cos(t), y:r*Math.sin(t)}; } },
+  triangle:    { type:'corners', N:15, openCap:false, corners:[[0,-1],[0.87,0.5],[-0.87,0.5]] },
+  uShape:      { type:'corners', N:14, openCap:true,  corners:[[-1,-1],[-1,1],[1,1],[1,-1]] },
+  // a real right-angle staircase: a small step down on the left, then a
+  // climb up to the right. Offset well below center (never near y=0) so
+  // every tread stays a safe distance from the origin — the near/far rings
+  // never collapse together the way the original diagonal version did.
+  stairs:      { type:'corners', N:16, openCap:true, preserveCorners:true, corners:[[-1,0.7],[-0.6,0.7],[-0.6,1.0],[-0.2,1.0],[-0.2,0.75],[0.2,0.75],[0.2,0.5],[0.6,0.5],[0.6,0.25],[1,0.25]] },
+  star:        { type:'corners', N:10, openCap:false, corners: starCorners() },
+  piano:       { type:'corners', N:16, openCap:true,  corners:[[-1,1],[1,1]] },
+  vShape:      { type:'corners', N:12, openCap:true,  corners:[[-1,-1],[0,1],[1,-1]] },
+  crookedV:    { type:'corners', N:12, openCap:true,  corners:[[-1,-0.5],[-0.2,1],[0.5,-0.2],[1,-1]] },
+  figure8:     { type:'radial', N:16, openCap:false, fn:function(t){ return {x:Math.sin(t), y:Math.sin(t)*Math.cos(t)}; } }
+};
+var SHAPE_ORDER = ['circle','square','cross','pinchedOval','smoothCross','triangle','uShape','stairs','star','piano','vShape','crookedV','figure8'];
+
+function buildShapePoints(def){
+  if(def.type==='radial'){
+    var pts=[];
+    for(var i=0;i<def.N;i++){ pts.push(def.fn(i/def.N*TWO_PI)); }
+    return pts;
+  }
+  if(def.preserveCorners) return sampleOpenPolylineKeepCorners(def.corners, def.N);
+  return def.openCap ? sampleOpenPolyline(def.corners, def.N) : sampleClosedPolyline(def.corners, def.N);
+}
+function randomShapeDef(){
+  var k1 = 2+Math.floor(Math.random()*4), k2 = 2+Math.floor(Math.random()*4);
+  var p1 = Math.random()*TWO_PI, p2 = Math.random()*TWO_PI;
+  var N = 10+Math.floor(Math.random()*7);
+  return { type:'radial', N:N, openCap:false, fn:function(t){
+    var r = 0.55 + 0.2*Math.sin(k1*t+p1) + 0.15*Math.sin(k2*t+p2);
+    r = clamp(r, 0.28, 1);
+    return { x:r*Math.cos(t), y:r*Math.sin(t) };
+  }};
+}
+
+// =====================================================================
+// level / color-set progression
+// =====================================================================
+var COLOR_SETS = [
+  { name:'NAVY',      color:'#3f6bff', pulsar:false, invisible:false },
+  { name:'RED',       color:'#ff2d3a', pulsar:true,  invisible:false },
+  { name:'YELLOW',    color:'#ffd23f', pulsar:true,  invisible:false },
+  { name:'ICE BLUE',  color:'#7fe8ff', pulsar:true,  invisible:false },
+  { name:'INVISIBLE', color:'#4a5578', pulsar:true,  invisible:true  },
+  { name:'GREEN',     color:'#39ff6a', pulsar:true,  invisible:false }
+];
+function levelInfo(L){
+  if(L<=78){
+    var setIndex = Math.floor((L-1)/13);
+    var shapeIndex = (L-1)%13;
+    return { colorSet:COLOR_SETS[setIndex], shapeName:SHAPE_ORDER[shapeIndex], shapeDef:SHAPE_LIB[SHAPE_ORDER[shapeIndex]], isRandom:false };
+  }
+  return { colorSet:COLOR_SETS[5], shapeName:'RANDOM', shapeDef:randomShapeDef(), isRandom:true };
+}
+
+// =====================================================================
+// persistent-within-session progress (per user: session only, resets on reload)
+// =====================================================================
+var sessionBestLevel = 1;
+var sessionBestScore = 0;
+
+// a nod to the original arcade's own "start anywhere you've earned" secret:
+// end a game on level 15-25 with a score ending in '69' — landing that exact
+// last-two-digits takes judiciously counted spike shots, at +3 each — and
+// the next game-over screen offers a jump straight to the start of any
+// later color loop (each of these levels is a freshly-recolored circle, 13
+// levels apart) instead of just resuming where you left off. Session only,
+// same as every other checkpoint here.
+var EASTER_EGG_LEVELS = [14,27,40,53,66,79];
+var easterEggUnlocked = false;
+
+// =====================================================================
+// game state
+// =====================================================================
+var state = 'title'; // title | playing | paused | warp | gameover
+var score, lives, level, tube, colorSet, superFull, superWeak, superFlashT;
+var player, bullets, enemies, spikes, particles, laneErode;
+var spawnQueue, spawnTimer, warpT, warpSwapped, coreFlash;
+var lastTime = 0;
+var idleTimer = 0, wheelActivity = false;
+var runStartLevel = 1, catchupBonusAwarded = true;
+
+function makeTube(L){
+  var info = levelInfo(L);
+  var pts = buildShapePoints(info.shapeDef);
+  var openCap = !!info.shapeDef.openCap;
+  return {
+    level:L, name:info.shapeName, colorSet:info.colorSet, openCap:openCap,
+    n: pts.length, unit: pts,               // n = point count (geometry array length)
+    lanes: openCap ? pts.length-1 : pts.length, // lanes = playable lane count
+    near: [], far: []
+  };
+}
+// the physical (unit-space, resolution-independent) distance between each
+// lane's center and the next lane's center — this is exactly how far a
+// flipper visually has to "flip" to cross that particular gap. On an
+// uneven shape (star, cross, figure-8...) some gaps are much wider than
+// others; used to scale how long a rim flipper pauses before each hop, so
+// a wide gap gives a real shot window and a narrow one is genuinely
+// dangerous, just like a skilled player exploits in the original arcade.
+function computeLaneGaps(t){
+  var L = t.lanes, n = t.n;
+  var maxI = t.openCap ? L-1 : L; // open shapes have no wrap-around gap past the last lane
+  var gaps = [];
+  for(var i=0;i<maxI;i++){
+    var a = laneCenter(t.unit, i, n);
+    var b = laneCenter(t.unit, (i+1)%L, n);
+    gaps.push(Math.hypot(a.x-b.x, a.y-b.y));
+  }
+  var total=0; for(var k=0;k<gaps.length;k++) total+=gaps[k];
+  t.laneGap = gaps;
+  t.avgLaneGap = gaps.length>0 ? total/gaps.length : 1;
+}
+// keeps a lane index legal: wraps for closed tubes, clamps (never crosses
+// the missing wall) for open tubes like U/V/stairs/piano
+function boundLane(i){
+  var r = Math.round(i);
+  if(tube.openCap) return clamp(r, 0, tube.lanes-1);
+  var L = tube.lanes; return ((r%L)+L)%L;
+}
+function boundLaneF(i){
+  if(tube.openCap) return clamp(i, 0, tube.lanes-1);
+  var L = tube.lanes; return ((i%L)+L)%L;
+}
+function syncTubeGeometry(){
+  if(!tube) return;
+  var cx=W/2, cy=H/2;
+  var rNear = 300*scale, rFar = 34*scale;
+  tube.near = tube.unit.map(function(p){ return {x:cx+p.x*rNear, y:cy+p.y*rNear}; });
+  tube.far  = tube.unit.map(function(p){ return {x:cx+p.x*rFar,  y:cy+p.y*rFar}; });
+}
+function laneCenter(arr, i, n){ var a=arr[i], b=arr[(i+1)%n]; return {x:(a.x+b.x)/2, y:(a.y+b.y)/2}; }
+function pointAtDepth(i, z, n){
+  var nn = laneCenter(tube.near, i, n), ff = laneCenter(tube.far, i, n);
+  return { x: lerp(ff.x,nn.x,z), y: lerp(ff.y,nn.y,z) };
+}
+
+function newLevel(L){
+  level = L;
+  tube = makeTube(L);
+  computeLaneGaps(tube);
+  colorSet = tube.colorSet;
+  syncTubeGeometry();
+  player.laneF = boundLaneF(player.laneF);
+  bullets = []; enemies = []; spikes = {}; particles = []; laneErode = {};
+  superFull = true; superWeak = true; superFlashT = 0;
+  spawnQueue = Math.min(40, 4 + Math.floor(L*1.1));
+  spawnTimer = 0.4;
+  coreFlash = 0;
+  invulnTimer = 2.0;
+  // a fresh level should never inherit a freeze/grace period left over from
+  // whatever ended the previous one — belt-and-suspenders alongside the
+  // resets already in beginWarp()/initGame(), so any future entry point
+  // that reaches a new level through some other path can't leave the game
+  // silently stuck "frozen" (and its wheel input silently blocked) forever
+  warpFreezeT = 0; warpFlashT = 0; deathFreezeT = 0; hazardInvuln = 0;
+}
+
+function initGame(startLevel){
+  score = 0; lives = 5;
+  // starting mid-run (a session checkpoint) begins at zero, not the score
+  // you had before — but clearing that first level pays out a catch-up
+  // bonus, same as the original arcade did
+  runStartLevel = startLevel||1;
+  catchupBonusAwarded = (runStartLevel<=1);
+  player = { laneF: 0, radius: 9, fireCd:0 };
+  particles = [];
+  invulnTimer = 2.0;
+  hazardInvuln = 0;
+  warpFreezeT = 0; warpFlashT = 0; deathFreezeT = 0;
+  idleTimer = 0;
+  newLevel(startLevel||1);
+  state = 'playing';
+}
+
+var invulnTimer = 0;
+// hazardInvuln is deliberately separate from invulnTimer: invulnTimer is a
+// general "safe from enemies" grace period (after a respawn, or as a
+// self-protection perk from firing the superzapper) and is NOT allowed to
+// shield you from a spike/eroded-wall hazard — those are solid, not an
+// enemy attack, and should kill you the instant you're in them regardless
+// of enemy-invulnerability. hazardInvuln exists only to stop a hazard death
+// from re-triggering on the very same frame it just fired; only
+// hazardKillPlayer()/warpDeath() ever set it.
+var hazardInvuln = 0;
+var warpFreezeT = 0, warpFlashT = 0;
+var deathFreezeT = 0;
+var WARP_FREEZE_T = 0.7;
+
+function spawnParticles(x,y,color,count,speedMul,lifeMul){
+  count=count||12;
+  for(var i=0;i<count;i++){
+    var a=Math.random()*TWO_PI, sp=(30+Math.random()*130)*(speedMul||1)*scale;
+    particles.push({x:x,y:y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:0,maxLife:(0.25+Math.random()*0.45)*(lifeMul||1),color:color,size:(1.4+Math.random()*2)*scale});
+  }
+}
+
+// breaks the player ship's own silhouette into flying, tumbling fragments —
+// used for the hazard "crash" so the death itself is unmistakably visual,
+// not just a generic spark burst that could be any impact at all.
+function shipShatter(x,y,ang){
+  var s = 11*scale;
+  var verts = [[-s*0.15,-s],[s*0.5,0],[-s*0.15,s],[s*0.1,0]];
+  var cosA=Math.cos(ang), sinA=Math.sin(ang);
+  function toWorld(pt){
+    return { x: x + pt[0]*cosA - pt[1]*sinA, y: y + pt[0]*sinA + pt[1]*cosA };
+  }
+  // the four hull edges, each its own tumbling shard
+  for(var i=0;i<verts.length;i++){
+    var a = toWorld(verts[i]);
+    var b = toWorld(verts[(i+1)%verts.length]);
+    var mx=(a.x+b.x)/2, my=(a.y+b.y)/2;
+    var dx=mx-x, dy=my-y, d=Math.hypot(dx,dy)||1;
+    var sp=(70+Math.random()*100)*scale;
+    particles.push({
+      x:mx, y:my,
+      vx:(dx/d)*sp + (Math.random()-0.5)*24*scale,
+      vy:(dy/d)*sp + (Math.random()-0.5)*24*scale,
+      life:0, maxLife:0.5+Math.random()*0.35,
+      color:'#4be3ff', size:0, shard:true,
+      len: Math.hypot(b.x-a.x, b.y-a.y),
+      ang: Math.atan2(b.y-a.y, b.x-a.x),
+      spin: (Math.random()-0.5)*9
+    });
+  }
+  // a few smaller hull-plate fragments so the break-up doesn't read as just
+  // four straight lines flying apart
+  for(var k=0;k<4;k++){
+    var a2 = Math.random()*TWO_PI, sp2=(50+Math.random()*90)*scale;
+    particles.push({
+      x:x, y:y,
+      vx:Math.cos(a2)*sp2, vy:Math.sin(a2)*sp2,
+      life:0, maxLife:0.4+Math.random()*0.3,
+      color: Math.random()<0.5 ? '#4be3ff' : '#9fe8ff',
+      size:0, shard:true,
+      len: s*(0.28+Math.random()*0.3),
+      ang: Math.random()*TWO_PI,
+      spin: (Math.random()-0.5)*11
+    });
+  }
+}
+
+// enemy factory -------------------------------------------------------
+function spawnEnemy(type, lane){
+  var base = { type:type, lane:lane, z:0, alive:true, onRim:false, rimLaneF:0, rimTimer:0 };
+  // climb speeds are tuned so a player can clear at least one full lap of the
+  // rim (n/ROT_SPEED seconds) before the first enemy of a fresh level arrives
+  if(type==='flipper'){ base.speed = 0.085+level*0.004; }
+  else if(type==='tanker'){ base.speed = 0.05+level*0.0025; base.cargo = Math.random()<0.5?'flipper':'flipper'; }
+  else if(type==='spiker'){ base.speed = 0.045+level*0.002; base.hp = 3; }
+  else if(type==='fuseball'){ base.speed = 0.09+level*0.005; base.jumpT = 0.5+Math.random()*0.6;
+    // on later levels a fuseball that reaches the rim plants itself there
+    // instead of hopping on — that lane is simply dead from then on
+    base.stationary = level>=10;
+  }
+  else if(type==='pulsar'){ base.speed = 0.04+level*0.0015; base.pulseT = 1.4+Math.random()*1.2; base.pulsing=0; }
+  enemies.push(base);
+}
+function pickEnemyType(){
+  var L = level;
+  var weights = { flipper:6, tanker:3, spiker:0, fuseball:0, pulsar:0 };
+  if(L>=2) weights.spiker = 2;
+  if(L>=4) weights.fuseball = 2 + Math.min(6, L*0.35);
+  if(colorSet.pulsar) weights.pulsar = 1.5 + Math.min(4, L*0.08);
+  var total=0; for(var k in weights) total+=weights[k];
+  var r = Math.random()*total;
+  for(var k2 in weights){ r-=weights[k2]; if(r<=0) return k2; }
+  return 'flipper';
+}
+
+// =====================================================================
+// update
+// =====================================================================
+function playerLane(){ return boundLane(player.laneF); }
+
+function killPlayer(){
+  if(invulnTimer>0 || state!=='playing') return;
+  var p = pointAtDepth(playerLane(),1,tube.n);
+  spawnParticles(p.x,p.y,'#4be3ff',24,1.3,1.1);
+  sfx.capture();
+  lives -= 1;
+  invulnTimer = 2.0;
+  if(lives<=0){ setTimeout(triggerGameOver, 500); }
+  else { resetEnemiesForNewLife(); }
+}
+
+// a spike or eroded wall is a harder, more deliberate hazard than an enemy
+// bump — it gets its own unmistakable "crash": a red flash, a crack, and a
+// brief freeze of the whole tube right at the point of impact, so the death
+// actually reads before anything moves on (including, critically, the level
+// transition itself — see the deathFreezeT guard on the level-clear check
+// below, which stops a same-frame level-clear from silently swallowing this).
+function hazardKillPlayer(){
+  if(hazardInvuln>0 || deathFreezeT>0 || state!=='playing') return;
+  var p = pointAtDepth(playerLane(),1,tube.n);
+  var ang = Math.atan2(H/2-p.y, W/2-p.x);
+  shipShatter(p.x,p.y,ang);
+  spawnParticles(p.x,p.y,'#ff4a4a',22,1.5,1.1);
+  spawnParticles(p.x,p.y,'#ffffff',10,0.8,0.6);
+  sfx.warpCrack();
+  lives -= 1;
+  warpFlashT = 0.35;
+  if(lives<=0){
+    hazardInvuln = 2.0;
+    deathFreezeT = WARP_FREEZE_T;
+    setTimeout(triggerGameOver, 900);
+  } else {
+    // short on purpose — the freeze itself is what sells the hit; the grace
+    // period after resuming just needs to be enough to react, not to be safe
+    hazardInvuln = 0.3;
+    deathFreezeT = WARP_FREEZE_T;
+  }
+}
+
+// A death shouldn't hand the next ship the same losing position: send every
+// surviving enemy back down toward the bottom of the tube (and clear rim
+// hazards) so the new ship gets a fair, fresh climb to defend against.
+// preserveHazards must be true when the death that triggered this WAS the
+// hazard itself (a spike/eroded wall) — otherwise this "fresh start"
+// fairness pass was quietly undoing the very hazard that just killed you,
+// clamping it down to a near-harmless height and letting you sail through
+// on the next attempt instead of dying again as intended.
+function resetEnemiesForNewLife(preserveHazards){
+  for(var i=0;i<enemies.length;i++){
+    var e = enemies[i];
+    e.onRim = false;
+    e.z = Math.min(e.z, 0.1+Math.random()*0.08);
+    if(e.type==='fuseball') e.jumpT = 0.6+Math.random()*0.6;
+    if(e.type==='pulsar'){ e.pulsing = 0; e.pulseT = Math.max(e.pulseT, 1.6); }
+  }
+  if(!preserveHazards){
+    for(var lane in spikes){ spikes[lane] = Math.min(spikes[lane], 0.08); }
+  }
+  bullets = [];
+}
+
+function update(dt){
+  syncTubeGeometry();
+  if(invulnTimer>0) invulnTimer -= dt;
+  if(hazardInvuln>0) hazardInvuln -= dt;
+  if(superFlashT>0) superFlashT -= dt;
+  if(coreFlash>0) coreFlash -= dt;
+
+  // --- player rotation (keyboard/touch; mouse wheel is applied directly in its own handler) ---
+  var rot = 0;
+  if(keys.left) rot -= 1;
+  if(keys.right) rot += 1;
+  player.laneF += rot * 16 * dt;
+  player.laneF = boundLaneF(player.laneF);
+
+  // --- firing ---
+  if(player.fireCd>0) player.fireCd -= dt;
+  if(keys.fire && player.fireCd<=0){
+    bullets.push({ lane: playerLane(), z: 1 });
+    player.fireCd = 0.15;
+    sfx.shoot();
+  }
+
+  // --- superzapper ---
+  if(keys.zap && (superFull||superWeak) && superFlashT<=0){
+    if(superFull){
+      superFull=false;
+      var cnt = enemies.length;
+      for(var i=0;i<enemies.length;i++){
+        var e = enemies[i];
+        var pp = e.onRim ? pointAtDepth(boundLane(e.rimLaneF),1,tube.n) : pointAtDepth(e.lane,e.z,tube.n);
+        spawnParticles(pp.x,pp.y, enemyColor(e.type), 10, 1, 0.7);
+        score += enemyScore(e.type);
+      }
+      enemies = [];
+      superFlashT = 0.5;
+      sfx.zap();
+    } else if(superWeak){
+      superWeak=false;
+      if(enemies.length>0){
+        var idx = Math.floor(Math.random()*enemies.length);
+        var e2 = enemies[idx];
+        var pp2 = e2.onRim ? pointAtDepth(boundLane(e2.rimLaneF),1,tube.n) : pointAtDepth(e2.lane,e2.z,tube.n);
+        spawnParticles(pp2.x,pp2.y, enemyColor(e2.type), 8, 1, 0.6);
+        score += enemyScore(e2.type);
+        enemies.splice(idx,1);
+      }
+      superFlashT = 0.25;
+      sfx.zap();
+    }
+    // a flat +1 for the press itself, on top of whatever it just killed —
+    // a superzapper is rarer and harder to time than a spike shot, but it
+    // should still nudge the last digit, so late-game (where a spike shot
+    // to land exactly on '69' is much harder to arrange) still has a path
+    score += 1;
+    invulnTimer = Math.max(invulnTimer, 0.6);
+  }
+  keys.zap = false; // one-shot per press-detection cycle handled by keydown edge below
+
+  // --- spawn enemies ---
+  if(spawnQueue>0){
+    spawnTimer -= dt;
+    if(spawnTimer<=0){
+      spawnEnemy(pickEnemyType(), Math.floor(Math.random()*tube.lanes));
+      spawnQueue -= 1;
+      spawnTimer = Math.max(0.22, 1.1 - level*0.018) * (0.7+Math.random()*0.7);
+    }
+  }
+
+  // --- spikes decay slowly is handled below in spiker section ---
+
+  // --- idle-homing pressure: the longer the player refuses to move or fire,
+  // the faster every remaining threat closes in. Without this a player can
+  // simply sit still forever once the level's spawn queue runs dry, which
+  // the original never allowed.
+  if(rot!==0 || keys.fire || keys.zap || wheelActivity){ idleTimer = 0; }
+  else { idleTimer += dt; }
+  wheelActivity = false;
+  var homingMul = idleTimer>4 ? Math.min(3, 1 + (idleTimer-4)*0.4) : 1;
+  var eDt = dt*homingMul;
+
+  // --- enemy update ---
+  var myLane = playerLane();
+
+  // a wall a pulsar has fully eroded away is a permanent hole for the rest
+  // of the level — flying into that lane is fatal, same as any other hazard
+  if(laneErode[myLane] && hazardInvuln<=0){ hazardKillPlayer(); }
+
+  for(var ei=enemies.length-1; ei>=0; ei--){
+    var en = enemies[ei];
+    if(en.type==='spiker'){
+      en.z = Math.min(1, en.z + en.speed*eDt);
+      spikes[en.lane] = en.z;
+      if(en.z>=1 && en.lane===myLane && invulnTimer<=0){ killPlayer(); }
+    } else if(en.type==='pulsar'){
+      en.z = Math.min(0.55, en.z + en.speed*eDt);
+      en.pulseT -= eDt;
+      if(en.pulseT<=0){
+        en.pulsing = 0.32;
+        en.pulseT = 2.0 + Math.random()*1.6 - level*0.03;
+        en.pulseT = Math.max(0.9, en.pulseT);
+        sfx.pulse();
+        // "side-removing" flourish: erode the nearer rim divider so the
+        // fortress visibly wears away as pulsars keep firing
+        laneErode[en.lane] = 1.0;
+      }
+      if(en.pulsing>0){
+        en.pulsing -= dt;
+        if(en.lane===myLane && invulnTimer<=0){ killPlayer(); }
+      }
+    } else if(en.type==='fuseball'){
+      en.z += en.speed*eDt;
+      en.jumpT -= eDt;
+      if(en.jumpT<=0){
+        en.lane = boundLane(en.lane + (Math.random()<0.5?-1:1));
+        en.jumpT = 0.35+Math.random()*0.5;
+      }
+    } else { // flipper, tanker
+      if(!en.onRim) en.z += en.speed*eDt;
+    }
+
+    // reaching the rim -> flip onto rim (flipper/tanker/fuseball) or hazard (spiker handled via spikes[], pulsar via pulsing)
+    if(!en.onRim && en.z>=1 && (en.type==='flipper'||en.type==='tanker'||en.type==='fuseball')){
+      if(en.lane===myLane && invulnTimer<=0){ killPlayer(); }
+      en.onRim = true; en.rimLaneF = en.lane; en.rimTimer = 0.28;
+      if(en.type==='tanker'){
+        sfx.tankerSplit();
+        var d1=boundLane(en.lane-1), d2=boundLane(en.lane+1);
+        spawnEnemy('flipper', d1); spawnEnemy('flipper', d2);
+        enemies.splice(ei,1); continue;
+      }
+    }
+    if(en.onRim){
+      // a "locked" fuseball (level 10+) plants itself on the rim instead of
+      // hopping toward the player — that lane just stays dead from then on
+      if(!en.stationary){
+        en.rimTimer -= eDt;
+        if(en.rimTimer<=0){
+          var dir;
+          if(tube.openCap){
+            // no wraparound on an open tube — just walk straight toward the player
+            dir = myLane>en.rimLaneF ? 1 : (myLane<en.rimLaneF ? -1 : 0);
+          } else {
+            // choose the shortest direction toward the player around the closed loop
+            var diff = ((myLane - en.rimLaneF + tube.lanes*3) % tube.lanes);
+            var altDiff = tube.lanes - diff;
+            dir = diff<=altDiff ? 1 : -1;
+          }
+          // the gap this specific hop crosses — physically wide gaps (a
+          // skilled player's preferred position, on an uneven shape) take
+          // longer to flip across than narrow ones, giving a real shot
+          // window on one and near-none on the other, same as the arcade
+          var base = Math.max(0.14, 0.44 - level*0.008);
+          if(dir!==0 && tube.laneGap && tube.avgLaneGap>0){
+            var fromLane = boundLane(en.rimLaneF);
+            var gapIdx = dir>0 ? fromLane : boundLane(fromLane-1);
+            var gap = tube.laneGap[gapIdx];
+            var ratio = gap!=null ? clamp(gap/tube.avgLaneGap, 0.4, 2.4) : 1;
+            en.rimTimer = base*ratio;
+          } else {
+            en.rimTimer = base;
+          }
+          en.rimLaneF = boundLaneF(en.rimLaneF + dir);
+        }
+      }
+      // checked every frame (not just on a hop tick) so flying into a
+      // stationary rim enemy is just as fatal as flying into a moving one
+      if(Math.round(en.rimLaneF)===myLane && invulnTimer<=0){ killPlayer(); }
+    }
+    if(en.z>1.6 || en.z<-0.3) { enemies.splice(ei,1); }
+  }
+
+  // spike hazard: dangerous once it's a real, substantial spike in the
+  // player's lane. (Note: a spike that was just shot down always lands a
+  // notch below full height from its knockback, so gating this on "full
+  // height" would make a freshly-killed spiker's leftover spike permanently
+  // safe — never what was intended.)
+  for(var lane in spikes){
+    if(spikes[lane]>=0.75 && parseInt(lane,10)===myLane && hazardInvuln<=0){ hazardKillPlayer(); }
+    // very slow passive decay so an abandoned spike doesn't wall a lane forever
+    var stillGrowing = enemies.some(function(e){ return e.type==='spiker' && e.lane===parseInt(lane,10); });
+    if(!stillGrowing){ spikes[lane] = Math.max(0, spikes[lane]-0.015*dt); }
+  }
+
+  // --- bullets ---
+  for(var bi=bullets.length-1; bi>=0; bi--){
+    var b = bullets[bi];
+    b.z -= 1.6*dt;
+    var hitSomething = false;
+    for(var ej=enemies.length-1; ej>=0; ej--){
+      var e2b = enemies[ej];
+      if(e2b.onRim){
+        if(Math.round(e2b.rimLaneF)===b.lane && b.z>=0.9){
+          resolveEnemyHit(e2b, ej); hitSomething=true; break;
+        }
+      } else if(e2b.type==='spiker'){
+        if(e2b.lane===b.lane && b.z<=e2b.z+0.03){
+          resolveEnemyHit(e2b, ej); hitSomething=true; break;
+        }
+      } else if(e2b.lane===b.lane && Math.abs(e2b.z-b.z)<0.06){
+        resolveEnemyHit(e2b, ej); hitSomething=true; break;
+      }
+    }
+    if(hitSomething){ bullets.splice(bi,1); continue; }
+    if(b.z<=0){ bullets.splice(bi,1); }
+  }
+
+  // --- particles ---
+  for(var pi=particles.length-1; pi>=0; pi--){
+    var p = particles[pi];
+    p.life += dt; p.x += p.vx*dt; p.y += p.vy*dt;
+    if(p.shard) p.ang += p.spin*dt;
+    if(p.life>=p.maxLife) particles.splice(pi,1);
+  }
+
+  // --- level clear check ---
+  // deathFreezeT guard: a hazard kill (spike/erosion) earlier in this very
+  // frame must not be silently overrun by the level already being clear —
+  // the crash freeze gets its moment first, and the transition is picked
+  // back up (still true, unless the death changed things) once it ends.
+  //
+  // "clear" also means every remaining straggler has already maxed out —
+  // on the rim, or a pulsar (which never climbs past mid-tube), or a spiker
+  // that's already grown its spike to full height. None of those get any
+  // more dangerous by waiting, and a pulsar in particular can erode its own
+  // lane solid, making it permanently unreachable without dying — the
+  // original arcade let a stalled level like this end once you simply
+  // outlast it, same as it did if you outlasted the enemies reaching the rim.
+  if(spawnQueue<=0 && state==='playing' && deathFreezeT<=0 &&
+     (enemies.length===0 || enemies.every(enemyIsStalled))){
+    beginWarp();
+  }
+}
+
+function enemyColor(type){
+  return type==='flipper'?'#ff5bd0': type==='tanker'?'#ff9d3d': type==='spiker'?'#b565f5': type==='fuseball'?'#fff7d6': '#9fe8ff';
+}
+// "stalled" = this enemy cannot become any more dangerous by the player
+// waiting longer — it has already reached whatever its maximum threat state
+// is. onRim enemies have finished climbing; a pulsar never climbs past
+// mid-tube in the first place; a spiker that's maxed its spike to full
+// height is done growing. Used only to decide whether a level with
+// leftover, un-killed stragglers still counts as "clear".
+function enemyIsStalled(e){
+  if(e.onRim) return true;
+  if(e.type==='pulsar') return true;
+  if(e.type==='spiker' && e.z>=1) return true;
+  return false;
+}
+function enemyScore(type){
+  return type==='flipper'?150: type==='tanker'?100: type==='spiker'?150: type==='fuseball'?50: 200;
+}
+function resolveEnemyHit(e, idx){
+  var pp = e.onRim ? pointAtDepth(boundLane(e.rimLaneF),1,tube.n) : pointAtDepth(e.lane,e.z,tube.n);
+  if(e.type==='spiker'){
+    // shooting the spike knocks the spiker back and shortens its trail;
+    // it takes a few hits ("worn down") before it's fully destroyed. every
+    // one of these hits pays out a small +3 — deliberately not a multiple
+    // of 50 like everything else — so a careful player can fine-tune the
+    // last two digits of their score by choosing exactly how many spike
+    // shots to land before finishing a level
+    e.hp -= 1;
+    e.z = Math.max(0, e.z - 0.14);
+    spikes[e.lane] = e.z;
+    score += 3;
+    spawnParticles(pp.x,pp.y,'#b565f5',6,0.6,0.4);
+    sfx.spikeHit();
+    if(e.hp>0) return; // survives, just pushed back — do not remove yet
+  }
+  spawnParticles(pp.x,pp.y, enemyColor(e.type), 10, 1, 0.6);
+  score += enemyScore(e.type);
+  if(e.type==='flipper') sfx.flipperDie();
+  else if(e.type==='fuseball') sfx.fuseDie();
+  else sfx.hit();
+  if(e.type==='tanker'){
+    sfx.tankerSplit();
+    var d1=boundLane(e.lane-1), d2=boundLane(e.lane+1);
+    spawnEnemy('flipper', d1); spawnEnemy('flipper', d2);
+  }
+  enemies.splice(idx,1);
+}
+
+// --- warp transition ---------------------------------------------------
+var WARP_SWAP_T = 0.55, WARP_TOTAL_T = 1.15;
+function beginWarp(){
+  state = 'warp'; warpT = 0; warpSwapped = false;
+  warpFreezeT = 0; warpFlashT = 0; deathFreezeT = 0;
+  particles = []; // don't carry the last kill's debris (frozen, since it isn't updated mid-warp) into the next level
+  sfx.warp();
+  // clearing the level you resumed at (after a prior game over) pays out a
+  // lump-sum catch-up bonus, exactly like clearing every level you skipped —
+  // this is how the original arcade rewarded a continued game
+  if(!catchupBonusAwarded && level===runStartLevel && runStartLevel>1){
+    catchupBonusAwarded = true;
+    var bonus = (runStartLevel-1)*1000;
+    score += bonus;
+    setTimeout(function(){ showBonusBanner(bonus); sfx.bigBonus(); }, 260);
+  }
+}
+// a spike (or eroded wall) left over from the level that just cleared is
+// still a real hazard through the first half of the warp animation — dying
+// to it here restarts the thrust so the player gets another look at it
+function warpDeath(){
+  if(hazardInvuln>0 || warpFreezeT>0) return;
+  var p = pointAtDepth(playerLane(),1,tube.n);
+  var ang = Math.atan2(H/2-p.y, W/2-p.x);
+  shipShatter(p.x,p.y,ang);
+  spawnParticles(p.x,p.y,'#ff4a4a',22,1.5,1.1);
+  spawnParticles(p.x,p.y,'#ffffff',10,0.8,0.6);
+  sfx.warpCrack();
+  lives -= 1;
+  warpFlashT = 0.35;
+  if(lives<=0){
+    hazardInvuln = 2.0;
+    // hold the freeze-frame briefly even on the fatal hit, so the crash still
+    // reads before the game-over screen takes over
+    warpFreezeT = WARP_FREEZE_T;
+    setTimeout(triggerGameOver, 900);
+  } else {
+    // deliberately SHORT — long enough to feel the hit, short enough that a
+    // player who doesn't escape the hazardous lane before the re-thrust can
+    // genuinely die again on the very next attempt
+    hazardInvuln = 0.3;
+    // freeze the thrust dead at the impact point (don't reset warpT yet) —
+    // the animation holds here, only debris keeps moving, until the freeze
+    // elapses and the re-thrust actually begins
+    warpFreezeT = WARP_FREEZE_T;
+  }
+}
+function updateParticlesOnly(dt){
+  for(var pi=particles.length-1; pi>=0; pi--){
+    var p2 = particles[pi];
+    p2.life += dt; p2.x += p2.vx*dt; p2.y += p2.vy*dt;
+    if(p2.shard) p2.ang += p2.spin*dt;
+    if(p2.life>=p2.maxLife) particles.splice(pi,1);
+  }
+}
+function updateWarpHazards(dt){
+  if(invulnTimer>0) invulnTimer -= dt;
+  if(hazardInvuln>0) hazardInvuln -= dt;
+
+  var rot = 0;
+  if(keys.left) rot -= 1;
+  if(keys.right) rot += 1;
+  player.laneF += rot * 16 * dt;
+  player.laneF = boundLaneF(player.laneF);
+
+  if(player.fireCd>0) player.fireCd -= dt;
+  if(keys.fire && player.fireCd<=0){
+    bullets.push({ lane: playerLane(), z: 1 });
+    player.fireCd = 0.15;
+    sfx.shoot();
+  }
+
+  for(var bi=bullets.length-1; bi>=0; bi--){
+    var b = bullets[bi];
+    b.z -= 1.6*dt;
+    var s = spikes[b.lane];
+    if(s!=null && s>0.02 && b.z<=s+0.03){
+      spikes[b.lane] = Math.max(0, s-0.35);
+      var pp = pointAtDepth(b.lane, spikes[b.lane], tube.n);
+      score += 3; // same fine-grained +3 as any other spike shot, including during the thrust
+      spawnParticles(pp.x,pp.y,'#b565f5',6,0.6,0.4);
+      sfx.spikeHit();
+      bullets.splice(bi,1); continue;
+    }
+    if(b.z<=0){ bullets.splice(bi,1); }
+  }
+
+  var myLane = playerLane();
+  for(var lane in spikes){
+    // during the thrust, even the smallest visible remnant of a spike is a
+    // hard hazard — this is the one moment the level explicitly asks you to
+    // either be clear of it or have shot it all the way down first
+    if(spikes[lane]>0.02 && parseInt(lane,10)===myLane && hazardInvuln<=0){ warpDeath(); return; }
+    spikes[lane] = Math.max(0, spikes[lane]-0.015*dt);
+  }
+  if(laneErode[myLane] && hazardInvuln<=0){ warpDeath(); return; }
+
+  updateParticlesOnly(dt);
+}
+function updateWarp(dt){
+  warpT += dt;
+  // swap to the next level's tube partway through the animation, so phase one
+  // (the old shape rocketing away) truly finishes before the new shape appears,
+  // instead of the old shape lingering through both halves of the transition
+  if(!warpSwapped && warpT>=WARP_SWAP_T){
+    warpSwapped = true;
+    sessionBestLevel = Math.max(sessionBestLevel, level+1);
+    newLevel(level+1);
+    sfx.levelClear();
+  }
+  if(warpT>=WARP_TOTAL_T){
+    state = 'playing';
+  }
+}
+
+// =====================================================================
+// drawing
+// =====================================================================
+var stars = [];
+function initStars(){
+  stars=[];
+  var n = Math.floor((W*H)/11000);
+  for(var i=0;i<n;i++) stars.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.3+0.3,tw:Math.random()*TWO_PI});
+}
+initStars();
+window.addEventListener('resize', initStars);
+
+function drawStars(){
+  for(var i=0;i<stars.length;i++){
+    var st=stars[i];
+    var tw = 0.5+0.5*Math.sin(st.tw+performance.now()*0.001);
+    ctx.fillStyle = 'rgba(200,215,255,'+(0.22*tw+0.06)+')';
+    ctx.beginPath(); ctx.arc(st.x,st.y,st.r,0,TWO_PI); ctx.fill();
+  }
+}
+
+function drawTube(alphaMul){
+  var n = tube.n;
+  var col = colorSet.color;
+  var baseAlpha = colorSet.invisible ? 0.10 : 1;
+  // occasional flicker reveal on invisible levels
+  if(colorSet.invisible && Math.sin(performance.now()*0.0016)>0.985) baseAlpha = 0.65;
+  ctx.save();
+  ctx.strokeStyle = col; ctx.shadowColor = col; ctx.shadowBlur = 10*(alphaMul==null?1:alphaMul);
+  ctx.lineWidth = 1.6;
+  ctx.globalAlpha = baseAlpha*(alphaMul==null?1:alphaMul);
+  // radial spokes
+  for(var i=0;i<n;i++){
+    ctx.beginPath();
+    ctx.moveTo(tube.far[i].x, tube.far[i].y);
+    ctx.lineTo(tube.near[i].x, tube.near[i].y);
+    ctx.stroke();
+  }
+  // far ring and near ring (rim) — draw exactly `lanes` edges. A closed tube's
+  // last edge wraps back to point 0; an open tube (U/V/stairs/piano/etc.) simply
+  // has no edge at all between its two end lanes — that's the real gap, not a
+  // faint line, so nothing (player, enemy or wall) can cross it.
+  var lanes = tube.lanes;
+  ctx.beginPath();
+  for(i=0;i<lanes;i++){
+    var fp=tube.far[i], fp2=tube.far[tube.openCap ? i+1 : (i+1)%n];
+    if(i===0) ctx.moveTo(fp.x,fp.y);
+    ctx.lineTo(fp2.x,fp2.y);
+  }
+  ctx.stroke();
+  for(i=0;i<lanes;i++){
+    var a=tube.near[i], b=tube.near[tube.openCap ? i+1 : (i+1)%n];
+    var erode = laneErode[i] || 0;
+    ctx.save();
+    ctx.globalAlpha = baseAlpha * (alphaMul==null?1:alphaMul) * (1-erode*0.85);
+    ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+    ctx.restore();
+  }
+  ctx.restore();
+}
+
+function drawSpikes(){
+  for(var lane in spikes){
+    var s = spikes[lane];
+    if(s<=0.01) continue;
+    var li = parseInt(lane,10);
+    var top = pointAtDepth(li, Math.min(1,s), tube.n);
+    var bot = pointAtDepth(li, 0, tube.n);
+    ctx.save();
+    ctx.strokeStyle = '#b565f5'; ctx.shadowColor='#b565f5'; ctx.shadowBlur=8; ctx.lineWidth=2.4*scale;
+    ctx.beginPath(); ctx.moveTo(bot.x,bot.y); ctx.lineTo(top.x,top.y); ctx.stroke();
+    ctx.restore();
+  }
+}
+
+function drawEnemyShape(type, x, y, size, wobble, pulsing){
+  ctx.save();
+  ctx.translate(x,y);
+  var col = enemyColor(type);
+  ctx.strokeStyle = col; ctx.fillStyle = col; ctx.shadowColor = col; ctx.shadowBlur = 10;
+  ctx.lineWidth = 2;
+  if(type==='flipper'){
+    ctx.rotate(wobble*0.35);
+    ctx.beginPath();
+    ctx.moveTo(-size, -size*0.7); ctx.lineTo(0,0); ctx.lineTo(-size, size*0.7);
+    ctx.moveTo(size, -size*0.7); ctx.lineTo(0,0); ctx.lineTo(size, size*0.7);
+    ctx.stroke();
+  } else if(type==='tanker'){
+    ctx.beginPath();
+    ctx.moveTo(0,-size); ctx.lineTo(size,0); ctx.lineTo(0,size); ctx.lineTo(-size,0); ctx.closePath();
+    ctx.globalAlpha=0.25; ctx.fill(); ctx.globalAlpha=1; ctx.stroke();
+  } else if(type==='spiker'){
+    ctx.rotate(performance.now()*0.003);
+    ctx.beginPath();
+    for(var k=0;k<3;k++){ var aa=k*(TWO_PI/3); ctx.moveTo(0,0); ctx.lineTo(Math.cos(aa)*size, Math.sin(aa)*size); }
+    ctx.stroke();
+    ctx.beginPath(); ctx.arc(0,0,size*0.35,0,TWO_PI); ctx.fill();
+  } else if(type==='fuseball'){
+    ctx.rotate(performance.now()*0.01);
+    ctx.beginPath();
+    for(var m=0;m<6;m++){ var ang=m*(TWO_PI/6); ctx.moveTo(0,0); ctx.lineTo(Math.cos(ang)*size, Math.sin(ang)*size); }
+    ctx.stroke();
+    ctx.beginPath(); ctx.arc(0,0,size*0.4,0,TWO_PI); ctx.fill();
+  } else if(type==='pulsar'){
+    var r = size*(pulsing>0?1.5:1);
+    ctx.beginPath();
+    for(var q=0;q<10;q++){ var aq=q*(TWO_PI/10); var rr = q%2===0? r : r*0.6; var px=Math.cos(aq)*rr, py=Math.sin(aq)*rr; if(q===0) ctx.moveTo(px,py); else ctx.lineTo(px,py); }
+    ctx.closePath();
+    ctx.globalAlpha = pulsing>0?0.55:0.22; ctx.fill(); ctx.globalAlpha=1; ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawPlayerLaneHighlight(){
+  var lane = playerLane();
+  var a1=tube.near[lane], a2=tube.near[(lane+1)%tube.n], f1=tube.far[lane], f2=tube.far[(lane+1)%tube.n];
+  ctx.save();
+  ctx.fillStyle = 'rgba(75,227,255,.14)';
+  ctx.beginPath();
+  ctx.moveTo(f1.x,f1.y); ctx.lineTo(a1.x,a1.y); ctx.lineTo(a2.x,a2.y); ctx.lineTo(f2.x,f2.y);
+  ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = '#4be3ff'; ctx.shadowColor='#4be3ff'; ctx.shadowBlur=10; ctx.lineWidth=2.2;
+  ctx.beginPath(); ctx.moveTo(f1.x,f1.y); ctx.lineTo(a1.x,a1.y); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(f2.x,f2.y); ctx.lineTo(a2.x,a2.y); ctx.stroke();
+  ctx.restore();
+}
+
+function drawPlayer(){
+  drawPlayerLaneHighlight();
+  if(invulnTimer>0 && Math.floor(performance.now()/90)%2===0) return;
+  var p = pointAtDepth(playerLane(), 1, tube.n);
+  var cx=W/2, cy=H/2;
+  // face radially inward (down the tube toward the enemies), not tangent to the rim
+  var ang = Math.atan2(cy-p.y, cx-p.x);
+  ctx.save();
+  ctx.translate(p.x,p.y);
+  ctx.strokeStyle='#4be3ff'; ctx.fillStyle='rgba(75,227,255,.2)'; ctx.shadowColor='#4be3ff'; ctx.shadowBlur=14; ctx.lineWidth=2;
+  var s = 11*scale;
+  ctx.rotate(ang);
+  ctx.beginPath();
+  ctx.moveTo(-s*0.15,-s); ctx.lineTo(s*0.5,0); ctx.lineTo(-s*0.15,s); ctx.lineTo(s*0.1,0); ctx.closePath();
+  ctx.fill(); ctx.stroke();
+  ctx.restore();
+}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  drawStars();
+  if(state==='title') return;
+  if(tube) syncTubeGeometry(); // keeps rendering in lockstep even if a resize lands mid-warp/pause
+
+  var warpScale = 1;
+  if(state==='warp'){
+    var swapFrac = WARP_SWAP_T/WARP_TOTAL_T;
+    var t = warpT/WARP_TOTAL_T;
+    if(t<swapFrac){
+      // phase 1: the OLD shape rockets toward the viewer and fully fades out —
+      // by the time this phase ends it must be completely gone
+      var t1 = t/swapFrac;
+      warpScale = 1 + t1*6.5;
+      ctx.save(); ctx.globalAlpha = clamp(1-t1*1.15,0,1);
+    } else {
+      // phase 2: the NEW shape (tube already swapped in updateWarp) grows in from a point
+      var t2 = (t-swapFrac)/(1-swapFrac);
+      warpScale = 0.04 + t2*0.96;
+      ctx.save(); ctx.globalAlpha = clamp(t2*1.3,0,1);
+    }
+    var cx=W/2, cy=H/2;
+    ctx.translate(cx,cy); ctx.scale(warpScale,warpScale); ctx.translate(-cx,-cy);
+  }
+
+  drawTube();
+  drawSpikes();
+
+  var n = tube.n;
+  for(var i=0;i<enemies.length;i++){
+    var e = enemies[i];
+    var pos = e.onRim ? pointAtDepth(boundLane(e.rimLaneF),1,n) : pointAtDepth(e.lane, clamp(e.z,0,1), n);
+    var depth = e.onRim ? 1 : e.z;
+    var size = lerp(4*scale, 13*scale, clamp(depth,0,1));
+    drawEnemyShape(e.type, pos.x, pos.y, size, i, e.pulsing);
+  }
+
+  ctx.save();
+  ctx.fillStyle = '#eaffef'; ctx.shadowColor='#9dffb0'; ctx.shadowBlur=8;
+  for(i=0;i<bullets.length;i++){
+    var b = bullets[i];
+    var bp = pointAtDepth(b.lane, clamp(b.z,0,1), n);
+    ctx.beginPath(); ctx.arc(bp.x,bp.y, 2.6*scale, 0, TWO_PI); ctx.fill();
+  }
+  ctx.restore();
+
+  for(i=0;i<particles.length;i++){
+    var p2=particles[i];
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, 1-p2.life/p2.maxLife);
+    if(p2.shard){
+      // a tumbling sliver of hull plating, not a spark — this is what makes
+      // a hazard death read as the ship itself coming apart
+      ctx.translate(p2.x,p2.y); ctx.rotate(p2.ang);
+      ctx.strokeStyle = p2.color; ctx.shadowColor = p2.color; ctx.shadowBlur = 7*scale;
+      ctx.lineWidth = 1.8*scale; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(-p2.len/2,0); ctx.lineTo(p2.len/2,0); ctx.stroke();
+    } else {
+      ctx.fillStyle = p2.color;
+      ctx.beginPath(); ctx.arc(p2.x,p2.y,p2.size,0,TWO_PI); ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  if(state==='playing' || (state==='warp' && !warpSwapped)) drawPlayer();
+
+  if(superFlashT>0){
+    ctx.save();
+    ctx.globalAlpha = Math.min(0.5, superFlashT);
+    ctx.fillStyle = '#ffd23f';
+    ctx.fillRect(0,0,W,H);
+    ctx.restore();
+  }
+
+  if(state==='warp') ctx.restore();
+
+  if(warpFlashT>0){
+    ctx.save();
+    ctx.globalAlpha = Math.min(0.6, warpFlashT*1.7);
+    ctx.fillStyle = '#ff2b2b';
+    ctx.fillRect(0,0,W,H);
+    ctx.restore();
+  }
+}
+
+// =====================================================================
+// HUD
+// =====================================================================
+var scoreEl=document.getElementById('score-val'), bestEl=document.getElementById('best-val');
+var livesEl=document.getElementById('lives'), hudEl=document.getElementById('hud');
+var levelBadge=document.getElementById('level-badge'), levelVal=document.getElementById('level-val'), setVal=document.getElementById('set-val');
+function pad(n){ n=Math.max(0,Math.floor(n)); var s=String(n); while(s.length<6) s='0'+s; return s; }
+function commas(n){ return String(Math.max(0,Math.floor(n))).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+var bonusBanner = document.getElementById('bonus-banner');
+var bonusBannerTimer = null;
+function showBonusBanner(amount){
+  bonusBanner.innerHTML = '<span class="lbl">CATCH-UP BONUS</span>+' + commas(amount);
+  bonusBanner.hidden = false;
+  requestAnimationFrame(function(){ bonusBanner.classList.add('show'); });
+  clearTimeout(bonusBannerTimer);
+  bonusBannerTimer = setTimeout(function(){
+    bonusBanner.classList.remove('show');
+    setTimeout(function(){ bonusBanner.hidden = true; }, 300);
+  }, 2400);
+}
+function renderHud(){
+  scoreEl.textContent = pad(score);
+  bestEl.textContent = pad(Math.max(sessionBestScore,score));
+  levelVal.textContent = level;
+  var lv = document.getElementById('level-val'); lv.style.color = colorSet.color;
+  setVal.textContent = colorSet.name + ' · ' + tube.name.toUpperCase();
+  setVal.style.color = colorSet.color;
+  document.getElementById('zap-pip-0').className = 'zap-pip'+(superFull?' on':'');
+  document.getElementById('zap-pip-1').className = 'zap-pip'+(superWeak?' on':'');
+  var html='';
+  for(var i=0;i<Math.max(0,lives);i++){
+    html += '<svg width="12" height="16" viewBox="0 0 12 16"><path d="M6 0 L11 12 L6 9 L1 12 Z" fill="none" stroke="#4be3ff" stroke-width="1.4"/></svg>';
+  }
+  livesEl.innerHTML = html;
+}
+
+// =====================================================================
+// state transitions
+// =====================================================================
+var overlay=document.getElementById('overlay'), panelTitle=document.getElementById('panel-title');
+function titleHtml(extra){
+  return '<h1>TUBE RUNNER</h1>'+
+    '<div class="sub">an homage to Atari\'s Tempest (1981)</div>'+
+    '<div class="sub credit-line">John Reed\'s favorite arcade game as a child</div>'+
+    '<div class="controls">'+
+      '<kbd>&larr; &rarr;</kbd><span>rotate around the rim</span>'+
+      '<kbd>wheel</kbd><span>rotate (scroll up/down)</span>'+
+      '<kbd>SPACE</kbd><span>fire (or left-click)</span>'+
+      '<kbd>Z</kbd><span>superzapper (or right-click)</span>'+
+      '<kbd>P</kbd><span>pause</span>'+
+    '</div>'+
+    '<div class="enemy-key">'+
+      '<span><i style="background:#ff5bd0;"></i>Flipper</span>'+
+      '<span><i style="background:#ff9d3d;"></i>Tanker</span>'+
+      '<span><i style="background:#b565f5;"></i>Spiker</span>'+
+      '<span><i style="background:#fff7d6;"></i>Fuseball</span>'+
+      '<span><i style="background:#9fe8ff;"></i>Pulsar (lvl 14+)</span>'+
+    '</div>'+
+    '<div style="font-size:11px;color:var(--muted);">Clear every enemy climbing the tube before they reach your rim. 13 shapes, endless levels, 5 ships. No survivors.</div>'+
+    (extra||'')+
+    '<button id="start-btn">'+(sessionBestLevel>1?'CONTINUE — LEVEL '+sessionBestLevel:'DROP IN')+'</button>'+
+    '<div class="credit">'+(sessionBestScore>0?'SESSION BEST '+pad(sessionBestScore)+' &middot; LEVEL '+sessionBestLevel:'')+'</div>';
+}
+function showTitle(){
+  state='title'; overlay.hidden=false; hudEl.hidden=true; levelBadge.hidden=true;
+  panelTitle.innerHTML = titleHtml();
+  document.getElementById('start-btn').addEventListener('click', function(){ ensureAudio(); startGame(sessionBestLevel); });
+}
+function startGame(atLevel){
+  ensureAudio();
+  initGame(atLevel||1);
+  overlay.hidden=true; hudEl.hidden=false; levelBadge.hidden=false;
+}
+function togglePause(){
+  if(state==='playing'){ state='paused'; overlay.hidden=false; panelTitle.innerHTML='<h1>PAUSED</h1><div class="sub">press P or ESC to resume</div>'; }
+  else if(state==='paused'){ state='playing'; overlay.hidden=true; }
+}
+function triggerGameOver(){
+  state='gameover';
+  sessionBestScore = Math.max(sessionBestScore, score);
+  sessionBestLevel = Math.max(sessionBestLevel, level);
+  sfx.gameover();
+  overlay.hidden=false;
+
+  // the secret: level 15-25, score ending in '69' — once earned it stays
+  // unlocked for the rest of the session, same as the checkpoint itself
+  var justUnlocked = false;
+  if(level>=15 && level<=25 && (score%100)===69){
+    if(!easterEggUnlocked) justUnlocked = true;
+    easterEggUnlocked = true;
+  }
+
+  var eggHtml = '';
+  if(easterEggUnlocked){
+    eggHtml =
+      '<div class="egg-banner">'+
+        '<div class="egg-title">'+(justUnlocked?'&#9670; SECRET FOUND &#9670;':'&#9670; SECRET UNLOCKED &#9670;')+'</div>'+
+        '<div class="egg-sub">score ending in ’69’ on level '+(justUnlocked?level:'15&ndash;25')+' &mdash; start your next run at any color loop:</div>'+
+        '<div class="egg-levels">'+
+          EASTER_EGG_LEVELS.map(function(L){ return '<button class="egg-btn" data-level="'+L+'">LEVEL '+L+'</button>'; }).join('')+
+        '</div>'+
+      '</div>';
+    sfx.bigBonus();
+  }
+
+  panelTitle.innerHTML =
+    '<h1 class="warn">SHIP LOST</h1>'+
+    '<div class="sub">the tube claims another pilot&hellip;</div>'+
+    '<div class="stat-row">'+
+      '<div class="stat"><div class="n">'+pad(score)+'</div><div class="l">SCORE</div></div>'+
+      '<div class="stat"><div class="n">'+pad(sessionBestScore)+'</div><div class="l">SESSION BEST</div></div>'+
+      '<div class="stat"><div class="n">'+level+'</div><div class="l">LEVEL REACHED</div></div>'+
+    '</div>'+
+    eggHtml+
+    '<button id="start-btn">'+(sessionBestLevel>1?'CONTINUE — LEVEL '+sessionBestLevel:'RETRY')+'</button>';
+  document.getElementById('start-btn').addEventListener('click', function(){ ensureAudio(); startGame(sessionBestLevel); });
+  if(easterEggUnlocked){
+    var eggBtns = document.querySelectorAll('.egg-btn');
+    for(var bi=0; bi<eggBtns.length; bi++){
+      eggBtns[bi].addEventListener('click', function(){
+        ensureAudio();
+        startGame(parseInt(this.getAttribute('data-level'),10));
+      });
+    }
+  }
+}
+function handleEnter(){
+  if(state==='title'||state==='gameover'){ startGame(sessionBestLevel); }
+  else if(state==='paused'){ togglePause(); }
+}
+
+// =====================================================================
+// main loop
+// =====================================================================
+function loop(ts){
+  if(!lastTime) lastTime=ts;
+  var dt = Math.min(0.033,(ts-lastTime)/1000);
+  lastTime = ts;
+  if(warpFlashT>0) warpFlashT = Math.max(0, warpFlashT-dt);
+  if(state==='playing'){
+    if(deathFreezeT>0){
+      // the world holds completely still at the point of impact — only the
+      // crash debris keeps animating — until the freeze elapses, then the
+      // ship (and, if the level was already clear, the level transition)
+      // picks back up from there
+      deathFreezeT -= dt;
+      updateParticlesOnly(dt);
+      if(deathFreezeT<=0 && lives>0){ resetEnemiesForNewLife(true); }
+    } else {
+      update(dt);
+    }
+    renderHud();
+  }
+  else if(state==='warp'){
+    if(warpFreezeT>0){
+      // held dead at the impact point — the thrust doesn't resume until this
+      // elapses, so the crash is a distinct, felt beat instead of an instant
+      // pass-through
+      warpFreezeT -= dt;
+      updateParticlesOnly(dt);
+      if(warpFreezeT<=0 && state==='warp' && lives>0){
+        // a genuine restart, not a silent resume: back to warpT=0 (the
+        // animation's own original-size frame) and the whoosh plays again,
+        // exactly like the very first thrust into this level
+        warpT = 0; warpSwapped = false;
+        sfx.warp();
+      }
+    } else {
+      var wasSwapped = warpSwapped;
+      updateWarp(dt);
+      if(!wasSwapped && !warpSwapped){ updateWarpHazards(dt); }
+    }
+    renderHud();
+  }
+  draw();
+  requestAnimationFrame(loop);
+}
+
+showTitle();
+requestAnimationFrame(loop);
+
+// debug hooks for automated QA only (not part of the normal UI)
+window.__tubeRunnerDebug = {
+  goToLevel: function(L){ if(state==='title') startGame(1); newLevel(L); state='playing'; },
+  spawn: function(type,lane){ spawnEnemy(type, lane==null?0:lane); },
+  getState: function(){ return { state:state, level:level, lives:lives, score:score, enemies:enemies.length, tubeName:tube&&tube.name, colorSet:colorSet&&colorSet.name, superFull:superFull, superWeak:superWeak, idleTimer:idleTimer, runStartLevel:runStartLevel, catchupBonusAwarded:catchupBonusAwarded, warpT:warpT, warpSwapped:warpSwapped, warpFreezeT:warpFreezeT, warpFlashT:warpFlashT, deathFreezeT:deathFreezeT, invulnTimer:invulnTimer, hazardInvuln:hazardInvuln, myLane:(tube?playerLane():null), mySpike:(tube?spikes[playerLane()]:null) }; },
+  forceGameOver: function(){ lives=0; triggerGameOver(); },
+  setScore: function(v){ score=v; },
+  setLevel: function(v){ level=v; },
+  getEasterEgg: function(){ return { unlocked:easterEggUnlocked, levels:EASTER_EGG_LEVELS }; },
+  forceWarp: function(){ spawnQueue=0; enemies=[]; },
+  emptySpawnQueue: function(){ spawnQueue=0; },
+  getTubeGaps: function(){ return { lanes:tube.lanes, laneGap:tube.laneGap, avgLaneGap:tube.avgLaneGap }; },
+  getEnemies: function(){ return enemies.map(function(e){return {type:e.type,lane:e.lane,z:e.z,onRim:e.onRim,pulsing:e.pulsing,rimLaneF:e.rimLaneF,rimTimer:e.rimTimer};}); },
+  forceOnRim: function(){ enemies.forEach(function(e){ e.z=1; e.onRim=true; e.rimLaneF=e.lane; e.rimTimer=0.2; }); return enemies.map(function(e){return {type:e.type,lane:e.lane,z:e.z,onRim:e.onRim,stationary:!!e.stationary};}); },
+  loseLife: function(){ invulnTimer=0; killPlayer(); return enemies.map(function(e){return {type:e.type,lane:e.lane,z:e.z,onRim:e.onRim};}); },
+  getPlayerAngle: function(){ var p=pointAtDepth(playerLane(),1,tube.n); return {lane:playerLane(), px:p.x, py:p.y, cx:W/2, cy:H/2}; },
+  setSpike: function(lane,val){ spikes[lane]=val; },
+  setErode: function(lane){ laneErode[lane]=1.0; },
+  forceIdle: function(seconds){ idleTimer = seconds; },
+  startAtLevel: function(L){ initGame(L); state='playing'; },
+  setInvuln: function(v){ invulnTimer=v; },
+  forceWarpDeath: function(){ warpDeath(); },
+  forceHazardDeath: function(){ hazardKillPlayer(); }
+};
+
+})();
+</script>
