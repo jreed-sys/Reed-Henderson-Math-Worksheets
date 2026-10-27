@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Geometry Honors — Reed-Henderson Math</title>
+<style>
+  :root{
+    --teal-900:#0f4c4c;
+    --teal-700:#146b6b;
+    --teal-500:#1f8a8a;
+    --teal-100:#d7ebe9;
+    --cream:#f7f4ec;
+    --paper:#ffffff;
+    --ink:#1c2b2b;
+    --ink-soft:#4a5a5a;
+    --answer-pink:#b0339e;
+    --line:#d8d2c2;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Segoe UI',Helvetica,Arial,sans-serif;
+    line-height:1.5;
+    padding-bottom:60px;
+  }
+  h1,h2,.display{ font-family:Georgia,'Times New Roman',serif; }
+  .wrap{max-width:820px;margin:0 auto;padding:0 20px;}
+
+  header.banner{
+    background:linear-gradient(135deg,var(--teal-900),var(--teal-700));
+    color:#fff;padding:44px 0 32px;
+  }
+  header.banner h1{margin:0 0 6px;font-size:30px;}
+  header.banner p{margin:0;opacity:.9;font-size:14.5px;}
+
+  .subject{
+    background:var(--paper);border:1px solid var(--line);
+    border-radius:var(--radius);padding:24px 26px;margin:26px 0;
+    box-shadow:0 2px 10px rgba(15,76,76,0.05);
+  }
+  .subject h2{
+    margin:0 0 4px;font-size:20px;color:var(--teal-900);
+    display:flex;align-items:center;gap:10px;
+  }
+  .subject .sub{color:var(--ink-soft);font-size:13px;margin:0 0 16px;}
+  .links{display:flex;flex-direction:column;gap:10px;}
+  a.lesson{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    background:#fbfaf6;border:1.5px solid var(--line);border-radius:10px;
+    padding:13px 16px;text-decoration:none;color:var(--ink);
+    font-size:15px;font-weight:600;transition:background .15s ease,border-color .15s ease;
+  }
+  a.lesson:hover{background:var(--teal-100);border-color:var(--teal-500);}
+  a.lesson .arrow{color:var(--teal-700);font-size:15px;font-weight:700;}
+  a.lesson.fun{border-color:var(--answer-pink);background:#fdf1fb;}
+  a.lesson.fun:hover{background:#fbe4f7;}
+  a.lesson.fun .arrow{color:var(--answer-pink);}
+  .divider{border:none;border-top:1px dashed var(--line);margin:14px 0;}
+  .group-label{font-size:12px;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em;margin:0 0 8px;}
+
+  footer{text-align:center;font-size:12px;color:var(--ink-soft);padding:30px 0 10px;}
+
+  a.back{display:inline-block;color:#fff;opacity:.9;font-size:13.5px;text-decoration:none;font-weight:600;margin-bottom:14px;}
+  a.back:hover{opacity:1;text-decoration:underline;}
+  .classes{display:flex;flex-direction:column;gap:16px;margin:28px 0;}
+  a.class-card{
+    display:flex;align-items:center;justify-content:space-between;gap:14px;
+    background:var(--paper);border:1.5px solid var(--line);border-radius:var(--radius);
+    padding:24px 26px;text-decoration:none;color:var(--ink);
+    box-shadow:0 2px 10px rgba(15,76,76,0.05);transition:background .15s ease,border-color .15s ease;
+  }
+  a.class-card:hover{background:var(--teal-100);border-color:var(--teal-500);}
+  a.class-card h2{margin:0 0 4px;font-size:22px;color:var(--teal-900);}
+  a.class-card p{margin:0;font-size:13.5px;color:var(--ink-soft);}
+  a.class-card .arrow{color:var(--teal-700);font-size:22px;font-weight:700;}
+
+  /* sticky top bar (appears once the big banner has scrolled away) + sticky module headings */
+  .topbar-fixed{
+    position:fixed;top:0;left:0;right:0;height:48px;z-index:30;
+    background:linear-gradient(135deg,var(--teal-900),var(--teal-700));color:#fff;
+    display:flex;align-items:center;box-shadow:0 2px 8px rgba(15,76,76,.25);
+    transform:translateY(-110%);transition:transform .2s ease;
+  }
+  .topbar-fixed .wrap{width:100%;display:flex;align-items:center;gap:14px;}
+  .topbar-fixed a.back{margin:0;white-space:nowrap;}
+  .topbar-fixed .ttl{font-family:Georgia,'Times New Roman',serif;font-weight:700;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  body.bar-on .topbar-fixed{transform:none;}
+  .subject{padding-top:0;}
+  .sec-head{
+    position:sticky;top:0;z-index:5;background:var(--paper);
+    margin:0 -26px 6px;padding:22px 26px 10px;border-bottom:1px solid var(--line);
+    border-radius:var(--radius) var(--radius) 0 0;
+  }
+  .sec-head h2{margin:0;}
+  body.bar-on .sec-head{top:48px;}
+  .subject .sub{margin-top:10px;}
+  @media (max-width:600px){
+    .subject{padding-left:18px;padding-right:18px;}
+    .sec-head{margin:0 -18px 6px;padding:16px 18px 8px;}
+    .sec-head h2{font-size:17px;}
+  }
+
+  .level-pill{display:inline-block;font-family:Inter,system-ui,sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:20px;vertical-align:middle;margin-left:6px;}
+  .level-pill.honors{background:#b0339e;color:#fff;}
+  .level-pill.onlevel{background:#d7ebe9;color:#0f4c4c;}
+  .switch{display:inline-block;margin-top:6px;font-size:13.5px;color:#fff;opacity:.9;}
+  .switch a{color:#fff;font-weight:700;}
+</style>
+</head>
+<body>
+
+<div class="topbar-fixed">
+  <div class="wrap">
+    <a class="back" href="index.html">← All classes</a>
+    <span class="ttl">📐 Geometry · Honors</span>
+  </div>
+</div>
+
+<header class="banner" id="banner">
+  <div class="wrap">
+    <a class="back" href="index.html">← All classes</a>
+    <h1>📐 Geometry <span class="level-pill honors">Honors</span></h1>
+    <p>Pick a lesson to open. Each one saves a PDF of your work and sends your results to your teacher when you submit.<br><span class="switch">In the other class? <a href="Geometry_OnLevel.html">Go to Geometry On-Level →</a></span></p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section class="subject">
+    <div class="sec-head"><h2>📐 Geometry — Explore</h2></div>
+    <p class="sub">Interactive tools for trying ideas out</p>
+    <div class="links">
+      <a class="lesson" href="Geometry_TriangleLengthExplorer.html">Can Any Three Lengths Make a Triangle? — stretch, swing, and test them <span class="arrow">→</span></a>
+      <a class="lesson" href="Geometry_TriangleCongruenceExplorer.html">Triangle Congruence Explorer — which parts are enough to make congruent triangles? <span class="arrow">→</span></a>
+    </div>
+  </section>
+
+  <section class="subject">
+    <div class="sec-head"><h2>📐 Geometry — Module 1, Topic 1</h2></div>
+    <p class="sub">Foundations of points, lines, planes, and logical reasoning</p>
+    <div class="links">
+      <a class="lesson" href="Geometry_M1T1L1.html">Lesson 1 — Points, Lines, Planes, Rays, and Line Segments <span class="arrow">→</span></a>
+      <a class="lesson" href="Geometry_M1T1L2.html">Lesson 2 — Formal Reasoning in Euclidean Geometry <span class="arrow">→</span></a>
+      <a class="lesson" href="Geometry_M1T1L3.html">Lesson 3 — Making Conjectures and Deductive Reasoning <span class="arrow">→</span></a>
+    </div>
+  </section>
+
+  <section class="subject">
+    <div class="sec-head"><h2>📐 Geometry — Module 1, Topic 2</h2></div>
+    <p class="sub">Coordinate geometry: constructing the plane, parallel/perpendicular lines, and classifying quadrilaterals</p>
+    <div class="links">
+      <a class="lesson" href="Geometry_M1T2L1.html">Lesson 1 — Constructing a Coordinate Plane <span class="arrow">→</span></a>
+      <a class="lesson" href="Geometry_M1T2L2.html">Lesson 2 — Parallel and Perpendicular Lines <span class="arrow">→</span></a>
+      <a class="lesson" href="Geometry_M1T2L3.html">Lesson 3 — Classifying Quadrilaterals on the Coordinate Plane <span class="arrow">→</span></a>
+      <a class="lesson" href="Geometry_M1T2L5.html">Lesson 5 — Area and Perimeter on the Coordinate Plane <span class="arrow">→</span></a>
+    </div>
+  </section>
+
+  <section class="subject">
+    <div class="sec-head"><h2>📐 Geometry — Module 1, Topic 3</h2></div>
+    <p class="sub">Sequences of rigid motions: translations, reflections, rotations, and compositions of rigid motions (with the lesson video)</p>
+    <div class="links">
+      <a class="lesson" href="Geometry_M1T3L1.html">Lesson 1 — Translations On and Off the Coordinate Plane <span class="arrow">→</span></a>
+      <a class="lesson" href="Geometry_M1T3L2.html">Lesson 2 — Sequences of Multiple Translations <span class="arrow">→</span></a>
+      <a class="lesson" href="Geometry_M1T3L3.html">Lesson 3 — Reflections On and Off the Coordinate Plane <span class="arrow">→</span></a>
+      <a class="lesson" href="Geometry_M1T3L4.html">Lesson 4 — Rotations On and Off the Coordinate Plane <span class="arrow">→</span></a>
+      <a class="lesson" href="Geometry_M1T3L5.html">Lesson 5 — Compositions of Functions <span class="arrow">→</span></a>
+    </div>
+  </section>
+
+  <section class="subject">
+    <div class="sec-head"><h2>📐 Geometry — Module 2, Topic 1</h2></div>
+    <p class="sub">Conjectures about triangles: base angles, exterior angles, the Triangle Inequality, and midsegments</p>
+    <div class="links">
+      <a class="lesson" href="Geometry_M2T1L4.html">Lesson 4 — Conjectures About Triangles <span class="arrow">→</span></a>
+    </div>
+  </section>
+
+  <section class="subject">
+    <div class="sec-head"><h2>📐 Geometry — Module 2, Topic 2</h2></div>
+    <p class="sub">Proof and logic: perpendicular bisector and isosceles triangle theorems, special right triangles, converse, inverse, contrapositive, direct proof, and indirect proof</p>
+    <div class="links">
+      <a class="lesson" href="Geometry_M2T2L4.html">Lesson 4 — Perpendicular Bisector and Isosceles Triangle Theorems <span class="arrow">→</span></a>
+      <a class="lesson" href="Geometry_M2T2L5.html">Lesson 5 — Inverse, Contrapositive, Direct Proof, and Indirect Proof <span class="arrow">→</span></a>
+    </div>
+  </section>
+
+  <section class="subject">
+    <div class="sec-head"><h2>📐 Geometry — Module 3, Topic 1</h2></div>
+    <p class="sub">Similarity: dilations, triangle similarity criteria, proportionality theorems, right-triangle similarity, and indirect measurement</p>
+    <div class="links">
+      <a class="lesson" href="Geometry_M3T1L1.html">Lesson 1 — Dilating Figures to Create Similar Figures <span class="arrow">→</span></a>
+      <a class="lesson" href="Geometry_M3T1L2.html">Lesson 2 — Establishing Triangle Similarity Criteria <span class="arrow">→</span></a>
+      <a class="lesson" href="Geometry_M3T1L3.html">Lesson 3 — Theorems About Proportionality <span class="arrow">→</span></a>
+      <a class="lesson" href="Geometry_M3T1L4.html">Lesson 4 — More Similar Triangles <span class="arrow">→</span></a>
+      <a class="lesson" href="Geometry_M3T1L5.html">Lesson 5 — Application of Similar Triangles <span class="arrow">→</span></a>
+    </div>
+  </section>
+
+</div>
+
+<footer>Reed-Henderson Math Worksheets</footer>
+
+<script>
+(function(){
+  var b=document.getElementById('banner');
+  function update(){ document.body.classList.toggle('bar-on', b.getBoundingClientRect().bottom<=0); }
+  window.addEventListener('scroll',update,{passive:true});
+  window.addEventListener('resize',update);
+  update();
+})();
+</script>
+</body>
+</html>

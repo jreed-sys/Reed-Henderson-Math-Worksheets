@@ -77,152 +77,28 @@
   a.class-card h2{margin:0 0 4px;font-size:22px;color:var(--teal-900);}
   a.class-card p{margin:0;font-size:13.5px;color:var(--ink-soft);}
   a.class-card .arrow{color:var(--teal-700);font-size:22px;font-weight:700;}
-
-  /* sticky top bar (appears once the big banner has scrolled away) + sticky module headings */
-  .topbar-fixed{
-    position:fixed;top:0;left:0;right:0;height:48px;z-index:30;
-    background:linear-gradient(135deg,var(--teal-900),var(--teal-700));color:#fff;
-    display:flex;align-items:center;box-shadow:0 2px 8px rgba(15,76,76,.25);
-    transform:translateY(-110%);transition:transform .2s ease;
-  }
-  .topbar-fixed .wrap{width:100%;display:flex;align-items:center;gap:14px;}
-  .topbar-fixed a.back{margin:0;white-space:nowrap;}
-  .topbar-fixed .ttl{font-family:Georgia,'Times New Roman',serif;font-weight:700;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  body.bar-on .topbar-fixed{transform:none;}
-  .subject{padding-top:0;}
-  .sec-head{
-    position:sticky;top:0;z-index:5;background:var(--paper);
-    margin:0 -26px 6px;padding:22px 26px 10px;border-bottom:1px solid var(--line);
-    border-radius:var(--radius) var(--radius) 0 0;
-  }
-  .sec-head h2{margin:0;}
-  body.bar-on .sec-head{top:48px;}
-  .subject .sub{margin-top:10px;}
-  @media (max-width:600px){
-    .subject{padding-left:18px;padding-right:18px;}
-    .sec-head{margin:0 -18px 6px;padding:16px 18px 8px;}
-    .sec-head h2{font-size:17px;}
-  }
 </style>
 </head>
 <body>
 
-<div class="topbar-fixed">
+<header class="banner">
   <div class="wrap">
-    <a class="back" href="index.html">← All classes</a>
-    <span class="ttl">📐 Geometry</span>
-  </div>
-</div>
-
-<header class="banner" id="banner">
-  <div class="wrap">
-    <a class="back" href="index.html">← All classes</a>
+    <a class="back" href="index.html" style="color:#fff;">← All classes</a>
     <h1>📐 Geometry</h1>
-    <p>Pick a lesson to open. Each one saves a PDF of your work and sends your results to your teacher when you submit.</p>
+    <p>Pick your class level.</p>
   </div>
 </header>
 
 <div class="wrap">
 
-  <section class="subject">
-    <div class="sec-head"><h2>📐 Geometry — Explore</h2></div>
-    <p class="sub">Interactive tools for trying ideas out</p>
-    <div class="links">
-      <a class="lesson" href="Geometry_TriangleLengthExplorer.html">Can Any Three Lengths Make a Triangle? — stretch, swing, and test them <span class="arrow">→</span></a>
-      <a class="lesson" href="Geometry_TriangleCongruenceExplorer.html">Triangle Congruence Explorer — which parts are enough to make congruent triangles? <span class="arrow">→</span></a>
-    </div>
-  </section>
+  <div class="classes">
+    <a class="class-card" href="Geometry_OnLevel.html"><div><h2>📐 Geometry — On-Level</h2><p>Lessons with extra support: worked examples and fuller hints</p></div><span class="arrow">→</span></a>
+    <a class="class-card" href="Geometry_Honors.html"><div><h2>📐 Geometry — Honors</h2><p>Lessons with fewer hints, more typed answers, and challenge problems</p></div><span class="arrow">→</span></a>
+  </div>
 
-  <section class="subject">
-    <div class="sec-head"><h2>📐 Geometry — Module 1, Topic 1</h2></div>
-    <p class="sub">Foundations of points, lines, planes, and logical reasoning</p>
-    <div class="links">
-      <a class="lesson" href="Geometry_M1T1L1.html">Lesson 1 — Points, Lines, Planes, Rays, and Line Segments <span class="arrow">→</span></a>
-      <a class="lesson" href="Geometry_M1T1L2.html">Lesson 2 — Formal Reasoning in Euclidean Geometry <span class="arrow">→</span></a>
-      <a class="lesson" href="Geometry_M1T1L3.html">Lesson 3 — Making Conjectures and Deductive Reasoning <span class="arrow">→</span></a>
-    </div>
-  </section>
-  <section class="subject">
-    <div class="sec-head"><h2>📐 Geometry — Module 1, Topic 2</h2></div>
-    <p class="sub">Coordinate geometry: constructing the plane, parallel/perpendicular lines, and classifying quadrilaterals</p>
-    <div class="links">
-      <a class="lesson" href="Geometry_M1T2L1.html">Lesson 1 — Constructing a Coordinate Plane <span class="arrow">→</span></a>
-      <a class="lesson" href="Geometry_M1T2L2.html">Lesson 2 — Parallel and Perpendicular Lines <span class="arrow">→</span></a>
-      <a class="lesson" href="Geometry_M1T2L3.html">Lesson 3 — Classifying Quadrilaterals on the Coordinate Plane <span class="arrow">→</span></a>
-      <a class="lesson" href="Geometry_M1T2L5.html">Lesson 5 — Area and Perimeter on the Coordinate Plane <span class="arrow">→</span></a>
-    </div>
-  </section>
-  <section class="subject">
-    <div class="sec-head"><h2>📐 Geometry — Module 1, Topic 3 (Honors)</h2></div>
-    <p class="sub">Sequences of rigid motions: translations, reflections, rotations, and compositions of rigid motions (with the lesson video)</p>
-    <div class="links">
-      <a class="lesson" href="Geometry_M1T3L1.html">Lesson 1 — Translations On and Off the Coordinate Plane <span class="arrow">→</span></a>
-      <a class="lesson" href="Geometry_M1T3L2.html">Lesson 2 — Sequences of Multiple Translations <span class="arrow">→</span></a>
-      <a class="lesson" href="Geometry_M1T3L3.html">Lesson 3 — Reflections On and Off the Coordinate Plane <span class="arrow">→</span></a>
-      <a class="lesson" href="Geometry_M1T3L4.html">Lesson 4 — Rotations On and Off the Coordinate Plane <span class="arrow">→</span></a>
-      <a class="lesson" href="Geometry_M1T3L5.html">Lesson 5 — Compositions of Functions <span class="arrow">→</span></a>
-    </div>
-  </section>
-  <section class="subject">
-    <div class="sec-head"><h2>📐 Geometry — Module 1, Topic 3 (On-Level)</h2></div>
-    <p class="sub">Same topic, built for extra support: worked step-by-step examples, hints on every problem, a word bank with pictures, and 20 questions per lesson</p>
-    <div class="links">
-      <a class="lesson" href="Geometry_M1T3L1_OnLevel.html">Lesson 1 — Translations On and Off the Coordinate Plane <span class="arrow">→</span></a>
-      <a class="lesson" href="Geometry_M1T3L2_OnLevel.html">Lesson 2 — Sequences of Multiple Translations <span class="arrow">→</span></a>
-      <a class="lesson" href="Geometry_M1T3L3_OnLevel.html">Lesson 3 — Reflections On and Off the Coordinate Plane <span class="arrow">→</span></a>
-      <a class="lesson" href="Geometry_M1T3L4_OnLevel.html">Lesson 4 — Rotations On and Off the Coordinate Plane <span class="arrow">→</span></a>
-      <a class="lesson" href="Geometry_M1T3L5_OnLevel.html">Lesson 5 — Compositions of Functions <span class="arrow">→</span></a>
-    </div>
-  </section>
-  <section class="subject">
-    <div class="sec-head"><h2>📐 Geometry — Module 2, Topic 1</h2></div>
-    <p class="sub">Conjectures about triangles: base angles, exterior angles, the Triangle Inequality, and midsegments</p>
-    <div class="links">
-      <a class="lesson" href="Geometry_M2T1L4.html">Lesson 4 — Conjectures About Triangles <span class="arrow">→</span></a>
-    </div>
-  </section>
-  <section class="subject">
-    <div class="sec-head"><h2>📐 Geometry — Module 2, Topic 2</h2></div>
-    <p class="sub">Proof and logic: perpendicular bisector and isosceles triangle theorems, special right triangles, converse, inverse, contrapositive, direct proof, and indirect proof</p>
-    <div class="links">
-      <a class="lesson" href="Geometry_M2T2L4.html">Lesson 4 — Perpendicular Bisector and Isosceles Triangle Theorems <span class="arrow">→</span></a>
-      <a class="lesson" href="Geometry_M2T2L5.html">Lesson 5 — Inverse, Contrapositive, Direct Proof, and Indirect Proof <span class="arrow">→</span></a>
-    </div>
-  </section>
-  <section class="subject">
-    <div class="sec-head"><h2>📐 Geometry — Module 3, Topic 1 (Honors)</h2></div>
-    <p class="sub">Similarity: dilations, triangle similarity criteria, proportionality theorems, right-triangle similarity, and indirect measurement</p>
-    <div class="links">
-      <a class="lesson" href="Geometry_M3T1L1.html">Lesson 1 — Dilating Figures to Create Similar Figures <span class="arrow">→</span></a>
-      <a class="lesson" href="Geometry_M3T1L2.html">Lesson 2 — Establishing Triangle Similarity Criteria <span class="arrow">→</span></a>
-      <a class="lesson" href="Geometry_M3T1L3.html">Lesson 3 — Theorems About Proportionality <span class="arrow">→</span></a>
-      <a class="lesson" href="Geometry_M3T1L4.html">Lesson 4 — More Similar Triangles <span class="arrow">→</span></a>
-      <a class="lesson" href="Geometry_M3T1L5.html">Lesson 5 — Application of Similar Triangles <span class="arrow">→</span></a>
-    </div>
-  </section>
-  <section class="subject">
-    <div class="sec-head"><h2>📐 Geometry — Module 3, Topic 1 (On-Level)</h2></div>
-    <p class="sub">Same topics, built for extra support: worked step-by-step examples, hints on every problem, a word bank with pictures, and 20 questions per lesson</p>
-    <div class="links">
-      <a class="lesson" href="Geometry_M3T1L1_OnLevel.html">Lesson 1 — Dilating Figures to Create Similar Figures <span class="arrow">→</span></a>
-      <a class="lesson" href="Geometry_M3T1L2_OnLevel.html">Lesson 2 — Establishing Triangle Similarity Criteria <span class="arrow">→</span></a>
-      <a class="lesson" href="Geometry_M3T1L3_OnLevel.html">Lesson 3 — Theorems About Proportionality <span class="arrow">→</span></a>
-      <a class="lesson" href="Geometry_M3T1L4_OnLevel.html">Lesson 4 — More Similar Triangles <span class="arrow">→</span></a>
-      <a class="lesson" href="Geometry_M3T1L5_OnLevel.html">Lesson 5 — Application of Similar Triangles <span class="arrow">→</span></a>
-    </div>
-  </section>
 </div>
 
 <footer>Reed-Henderson Math Worksheets</footer>
 
-<script>
-(function(){
-  var b=document.getElementById('banner');
-  function update(){ document.body.classList.toggle('bar-on', b.getBoundingClientRect().bottom<=0); }
-  window.addEventListener('scroll',update,{passive:true});
-  window.addEventListener('resize',update);
-  update();
-})();
-</script>
 </body>
 </html>
