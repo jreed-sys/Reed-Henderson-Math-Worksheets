@@ -559,6 +559,18 @@ footer.foot{
 
 </style>
 
+<style id="phone-fit">
+/* Phone-width fixes (2026-10-26): keep everything inside a 390px screen. Desktop layout is unchanged. */
+@media (max-width:600px){
+  .q-text{display:block !important;}
+  .q-text > .q-num{display:inline-flex !important;vertical-align:middle;}
+  select.ans{max-width:100% !important;}
+  .answer-row{flex-wrap:wrap;min-width:0;}
+  table.data-table,table.worked-table{display:block;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .canvas-wrap{max-width:100%;}
+  .canvas-wrap canvas{max-width:100%;height:auto;}
+}
+</style>
 <div id="startScreen">
   <div class="start-card">
     <div class="lesson-badge">5</div>

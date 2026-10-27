@@ -107,6 +107,18 @@
 </head>
 <body>
 
+<style id="phone-fit">
+/* Phone-width fixes (2026-10-26): keep everything inside a 390px screen. Desktop layout is unchanged. */
+@media (max-width:600px){
+  .q-text{display:block !important;}
+  .q-text > .q-num{display:inline-flex !important;vertical-align:middle;}
+  select.ans{max-width:100% !important;}
+  .answer-row{flex-wrap:wrap;min-width:0;}
+  table.data-table,table.worked-table{display:block;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .canvas-wrap{max-width:100%;}
+  .canvas-wrap canvas{max-width:100%;height:auto;}
+}
+</style>
 <div id="startScreen">
   <div class="start-card">
     <div class="num">2</div>
@@ -143,6 +155,8 @@
   </header>
 
   <div class="wrap" id="pdfRoot">
+    <div class="video-intro" style="margin:18px 0;"><div style="background:#fff;border:1px solid #d8d2c2;border-radius:14px;padding:14px 16px;"><b style="display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#146b6b;margin-bottom:8px;">Watch First</b><div style="position:relative;width:100%;padding-top:56.25%;border-radius:10px;overflow:hidden;background:#0f4c4c;"><iframe src="https://player.vimeo.com/video/1196972425?app_id=122963" style="position:absolute;inset:0;width:100%;height:100%;border:0;" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" referrerpolicy="strict-origin-when-cross-origin" title="Formal Reasoning in Euclidean Geometry"></iframe></div><p style="font-size:13px;color:#4a5a5a;margin:8px 0 0;">A short video introduction for this lesson. Watch it before you begin the Getting Started activity below.</p></div></div>
+
     <div class="keyterms">
       <b>Key terms in this lesson</b>
       conditional statement · counterexample · hypothesis · conclusion · postulate · theorem · validity · Euclidean geometry · proof · great circle · spherical geometry
