@@ -2611,4 +2611,124 @@ document.addEventListener('DOMContentLoaded', () => {
   }).observe(document.body,{childList:true,subtree:true,characterData:true});
 })();
 
-</script><!--ROSTER-LOGIN-END-->
+</script><!--ROSTER-LOGIN-END--><!--AUTOSAVE-ADDON-START--><script>
+/* AUTOSAVE-ADDON v1: automatic progress saving for lesson pages (this browser only).
+   Saves the student's answers every few seconds, keyed by lesson + name. Starting again with the same name
+   offers "Continue where I left off". Practice mode saves nothing. Never throws: if storage is blocked the
+   page works exactly as before. Uses the page's own serializeProgress/applyRestore when present. */
+(function(){
+  if(window.__asAddon) return; window.__asAddon=true;
+  try{
+    if(typeof TOPIC_NAME==='undefined') return;
+    var ws=document.getElementById('worksheet')||document.getElementById('worksheetWrap'), startBtn=document.getElementById('startBtn');
+    if(!ws||!startBtn) return;
+    var domName='';
+    var PREFIX='rhmw-autosave:', on=false, timer=null, lastSig='', started=false;
+    function norm(n){ try{ if(typeof normalize==='function') return normalize(n||''); }catch(e){} return String(n||'').trim().toLowerCase().replace(/\s+/g,' '); }
+    function key(n){ return PREFIX+TOPIC_NAME+'::'+norm(n); }
+    function name(){ try{ if(typeof studentName==='string' && studentName.trim()) return studentName; }catch(e){} return domName; }
+    function tget(){ try{ if((typeof startTime==='object'||typeof startTime==='number') && startTime) return startTime; }catch(e){} try{ if((typeof timeStarted==='object'||typeof timeStarted==='number') && timeStarted) return timeStarted; }catch(e){} return null; }
+    function tset(el){
+      try{ if(typeof startTime!=='undefined') { startTime=(startTime instanceof Date)?new Date(Date.now()-el):(Date.now()-el); return; } }catch(e){}
+      try{ if(typeof timeStarted!=='undefined') { timeStarted=(timeStarted instanceof Date)?new Date(Date.now()-el):(Date.now()-el); } }catch(e){}
+    }
+    function isPractice(){ return norm(name())==='practice'; }
+    function ser(){
+      if(typeof serializeProgress==='function') return serializeProgress();
+      var fields={}, radios={}, canvases={};
+      document.querySelectorAll('#worksheet input.ans, #worksheet textarea.ans, #worksheet select.ans').forEach(function(el){ if(el.id) fields[el.id]=el.value; });
+      document.querySelectorAll('#worksheet input[type=radio]:checked').forEach(function(el){ if(el.name) radios[el.name]=el.value; });
+      document.querySelectorAll('canvas.sketch').forEach(function(c){ if(c.id){ try{ canvases[c.id]=c.toDataURL(); }catch(e){} } });
+      var st=tget();
+      var t0=st?(st instanceof Date?st.getTime():+st):Date.now();
+      return {formatVersion:1, lessonKey:TOPIC_NAME, studentName:name(), firstStartedAt:new Date(t0).toISOString(), accumulatedElapsedMs:Date.now()-t0, savedAt:new Date().toISOString(), fields:fields, radios:radios, canvases:canvases};
+    }
+    function applyData(d){
+      if(typeof applyRestore==='function'){ applyRestore(d); return; }
+      Object.keys(d.fields||{}).forEach(function(id){ var el=document.getElementById(id); if(el) el.value=d.fields[id]; });
+      Object.keys(d.radios||{}).forEach(function(n){ document.querySelectorAll('input[name="'+n+'"]').forEach(function(el){ if(el.value===d.radios[n]) el.checked=true; }); });
+      Object.keys(d.canvases||{}).forEach(function(id){ var c=document.getElementById(id); if(!c) return; var cx=c.getContext('2d'), im=new Image(); im.onload=function(){ cx.drawImage(im,0,0); }; im.src=d.canvases[id]; });
+    }
+    function hasProgress(d){
+      var f=d.fields||{}, r=d.radios||{};
+      return Object.keys(f).some(function(k){ return String(f[k]||'').trim()!==''; }) || Object.keys(r).length>0;
+    }
+    function chip(state,text){
+      var c=document.getElementById('asChip'); if(!c) return;
+      c.textContent=text; c.style.color=state==='err'?'#c0392b':(state==='ok'?'#1f8a4c':'#4a5a5a');
+    }
+    function read(n){
+      try{ if(!String(n||'').trim()) return null; var raw=window.localStorage.getItem(key(n)); if(!raw) return null;
+        var d=JSON.parse(raw); return (d&&d.lessonKey===TOPIC_NAME)?d:null; }catch(e){ return null; }
+    }
+    function sig(d){ var c={}; Object.keys(d).forEach(function(k){ if(k!=='savedAt'&&k!=='accumulatedElapsedMs') c[k]=d[k]; }); return JSON.stringify(c); }
+    function save(force){
+      if(!on||isPractice()) return;
+      var d; try{ d=ser(); }catch(e){ return; }
+      var s=sig(d); if(!force&&s===lastSig) return;
+      try{ window.localStorage.setItem(key(name()),JSON.stringify(d)); lastSig=s; }
+      catch(e){
+        try{ d.canvases={}; window.localStorage.setItem(key(name()),JSON.stringify(d)); lastSig=s; }
+        catch(e2){ chip('err','⚠ Autosave off — use Save Progress'); return; }
+      }
+      chip('ok','✓ Autosaved '+new Date().toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}));
+    }
+    function soon(){ if(!on) return; clearTimeout(timer); timer=setTimeout(function(){ save(false); },1200); }
+    function btnStyle(b,pri){ b.style.cssText='font:600 14px Inter,sans-serif;border-radius:10px;padding:10px 16px;cursor:pointer;margin:4px 6px 0 0;border:1.5px solid #146b6b;'+(pri?'background:#146b6b;color:#fff;':'background:#fff;color:#0f4c4c;'); }
+    function applyResume(d){
+      try{ applyData(d); }catch(e){}
+      try{
+        var el=+d.accumulatedElapsedMs||0;
+        if(d.firstStartedAt&&typeof firstStartedAt!=='undefined') firstStartedAt=new Date(d.firstStartedAt);
+        tset(el);
+      }catch(e){}
+      try{ var w=document.getElementById('whoStart'); if(w&&typeof firstStartedAt!=='undefined'&&firstStartedAt) w.textContent=firstStartedAt.toLocaleTimeString(); }catch(e){}
+    }
+    function ask(d){
+      var ov=document.createElement('div'); ov.id='asResume';
+      ov.style.cssText='position:fixed;inset:0;background:rgba(15,76,76,.55);z-index:5000;display:flex;align-items:center;justify-content:center;padding:16px;';
+      var box=document.createElement('div'); box.setAttribute('role','dialog'); box.setAttribute('aria-modal','true');
+      box.style.cssText='background:#fff;border-radius:14px;max-width:460px;width:100%;padding:22px 24px;font-family:Inter,sans-serif;color:#1c2b2b;box-shadow:0 12px 40px rgba(0,0,0,.3);';
+      var when=''; try{ when=new Date(d.savedAt).toLocaleString([],{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}); }catch(e){}
+      var nm=String(name()).replace(/[<>&]/g,'');
+      var n=0; try{ n=Object.keys(d.fields||{}).filter(function(k){ return String(d.fields[k]||'').trim()!==''; }).length+Object.keys(d.radios||{}).length; }catch(e){}
+      box.innerHTML='<div style="font-family:Fraunces,serif;font-weight:700;font-size:21px;color:#0f4c4c;margin-bottom:6px">Welcome back, '+nm+'!</div>'+
+        '<div style="font-size:14.5px;line-height:1.5;margin-bottom:12px">We found your saved work'+(when?' from <b>'+when+'</b>':'')+' ('+n+' answers). Do you want to pick up where you left off?</div><div id="asBtns"></div>'+
+        '<div style="font-size:12px;color:#4a5a5a;margin-top:10px">Starting over erases that saved work on this computer.</div>';
+      var go=document.createElement('button'); go.type='button'; go.textContent='Continue where I left off'; btnStyle(go,true);
+      var fresh=document.createElement('button'); fresh.type='button'; fresh.textContent='Start over'; btnStyle(fresh,false);
+      box.querySelector('#asBtns').appendChild(go); box.querySelector('#asBtns').appendChild(fresh);
+      ov.appendChild(box); document.body.appendChild(ov); go.focus();
+      go.addEventListener('click',function(){ applyResume(d); ov.remove(); on=true; save(true); });
+      fresh.addEventListener('click',function(){ try{ window.localStorage.removeItem(key(name())); }catch(e){} ov.remove(); on=true; save(true); });
+    }
+    function afterStart(){
+      if(started) return;
+      try{
+        var inp=document.getElementById('studentName')||document.getElementById('nameInput');
+        if(inp&&String(inp.value||'').trim()) domName=String(inp.value).trim();
+        var ss=document.getElementById('startScreen'), hidden=!!ss&&(ss.hidden||getComputedStyle(ss).display==='none');
+        if(!(tget()||hidden)||!String(name()).trim()) return;
+        started=true;
+        if(isPractice()){ chip('','Practice: nothing is saved'); return; }
+        var d=read(name());
+        if(d&&hasProgress(d)) ask(d); else { on=true; save(true); }
+      }catch(e){ on=true; }
+    }
+    (function mkChip(){
+      var tb=document.querySelector('.topbar'); if(!tb) return;
+      var c=document.createElement('span'); c.id='asChip'; c.style.cssText='font:600 12px JetBrains Mono,monospace;color:#4a5a5a;white-space:nowrap;';
+      var anchor=document.getElementById('saveProgressBtn')||document.getElementById('saveBtn');
+      if(anchor&&anchor.parentNode===tb) tb.insertBefore(c,anchor); else tb.appendChild(c);
+    })();
+    startBtn.addEventListener('click',function(){ setTimeout(afterStart,0); setTimeout(afterStart,600); });
+    ['input','change'].forEach(function(ev){ ws.addEventListener(ev,soon,true); });
+    ws.addEventListener('pointerup',function(e){ if(e.target&&e.target.matches&&e.target.matches('canvas.sketch')) soon(); },true);
+    ws.addEventListener('click',function(e){ if(e.target&&e.target.closest&&e.target.closest('.clear-canvas')) soon(); },true);
+    setInterval(function(){ save(false); },20000);
+    document.addEventListener('visibilitychange',function(){ if(document.visibilityState==='hidden') save(true); });
+    window.addEventListener('pagehide',function(){ save(true); });
+    window.__asAddonApi={save:save,read:read,key:key};
+  }catch(e){}
+})();
+</script><!--AUTOSAVE-ADDON-END-->
