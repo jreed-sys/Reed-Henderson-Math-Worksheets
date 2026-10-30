@@ -2351,7 +2351,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </script>
 <!--ROSTER-LOGIN-START--><script>
-/* ROSTER-LOGIN v1: name pulldown + 2-digit code + practice mode. Inserted just before </body>. */
+/* ROSTER-LOGIN v2: name pulldown + 2-digit code + practice mode, pre-filled from the index sign-in (sessionStorage 'rhmw-session'). Inserted just before </body>. */
 (function(){
   if(window.__rosterLogin) return; window.__rosterLogin=true;
   var nameIn=document.getElementById('nameInput')||document.getElementById('studentName'), startBtn=document.getElementById('startBtn');
@@ -2364,6 +2364,7 @@ document.addEventListener('DOMContentLoaded', () => {
   box.innerHTML='<select id="rlName" aria-label="Your name" style="'+FS+'"><option value="">Loading the class list…</option></select>'+
     '<div id="rlCodeRow"><label for="rlCode" style="display:block;font-size:13px;font-weight:600;color:#0f4c4c;margin-bottom:6px">Your 2-digit code</label>'+
     '<input id="rlCode" type="text" inputmode="numeric" maxlength="2" autocomplete="off" placeholder="00" aria-label="Your 2-digit code" style="'+FS+'width:110px;letter-spacing:.3em;text-align:center;-webkit-text-security:disc"></div>'+
+    '<div id="rlWho" style="display:none;font-size:13px;color:#4a5a5a;margin:0 0 8px"></div>'+
     '<div id="rlMsg" style="font-size:13px;min-height:18px;color:#4a5a5a" aria-live="polite"></div>';
   nameIn.parentNode.insertBefore(box,nameIn.nextSibling);
   sel=box.querySelector('#rlName'); code=box.querySelector('#rlCode'); codeRow=box.querySelector('#rlCodeRow'); msgEl=box.querySelector('#rlMsg');
@@ -2389,11 +2390,33 @@ document.addEventListener('DOMContentLoaded', () => {
     nameIn.style.display='';
     box.querySelector('#rlPracBtn').addEventListener('click',function(){ practice=true; pill.style.display='block'; nameIn.value='Practice'; nameIn.style.display='none'; box.innerHTML='<div style="font-size:13px;color:#4a5a5a">Practice mode is on.</div>'; setName('Practice'); });
   }
+
+  // ---- shared sign-in (written by the index page and by this block; per tab, cleared when the tab closes)
+  var SKEY='rhmw-session', whoEl=box.querySelector('#rlWho');
+  function readSess(){ try{ var o=JSON.parse(sessionStorage.getItem(SKEY)||'null'); if(o&&o.t&&Date.now()-o.t>36e6) return null; return o; }catch(e){ return null; } }
+  function clearSess(){ try{ sessionStorage.removeItem(SKEY); }catch(e){} }
+  function subjectKey(){ var u=String(SHEET_WEBAPP_URL); return u.indexOf('6atIAvQ')>=0?'Geometry':(u.indexOf('2Ims9Zl')>=0?'Algebra2':''); }
+  function saveSess(name,c){
+    try{ var k=subjectKey(); if(!k) return; var o=readSess(), subj=[k];
+      if(o&&o.name===name&&o.subjects){ o.subjects.forEach(function(x){ if(subj.indexOf(x)<0) subj.push(x); }); }
+      sessionStorage.setItem(SKEY,JSON.stringify({name:name,code:c,subjects:subj,t:Date.now()}));
+    }catch(e){}
+  }
+  function prefill(names){
+    var o=readSess();
+    if(!o||o.practice||!o.name||!/^\d{2}$/.test(o.code||'')||names.indexOf(o.name)<0) return;
+    sel.value=o.name; code.value=o.code; sync();
+    whoEl.textContent='Signed in from the home page as '+o.name+'. ';
+    var b=document.createElement('button'); b.type='button'; b.textContent='Not you?';
+    b.style.cssText='border:0;background:none;color:#146b6b;text-decoration:underline;cursor:pointer;font:inherit;padding:0';
+    b.addEventListener('click',function(){ clearSess(); sel.value=''; code.value=''; sync(); whoEl.style.display='none'; sel.focus(); });
+    whoEl.appendChild(b); whoEl.style.display='block';
+  }
   // load the roster (names only)
   origFetch(SHEET_WEBAPP_URL+'?action=roster',{signal:withTimeout(9000)}).then(function(r){ return r.json(); }).then(function(d){
     if(!d||!d.names||!d.names.length){ showTyped('The class list is not available right now, so type your name. Your work will be marked <b>unverified</b>.'); return; }
     var h='<option value="">— choose your name —</option>'; d.names.forEach(function(n){ h+='<option>'+n.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</option>'; });
-    h+='<option value="__practice__">Practice (nothing is saved)</option>'; sel.innerHTML=h; sel.disabled=false;
+    h+='<option value="__practice__">Practice (nothing is saved)</option>'; sel.innerHTML=h; sel.disabled=false; prefill(d.names);
   }).catch(function(){ showTyped('The class list could not load on this network, so type your name. Your work will be marked <b>unverified</b>.'); });
   sel.addEventListener('change',function(){ sync(); if(sel.value&&sel.value!=='__practice__') code.focus(); });
   code.addEventListener('input',function(){ code.value=code.value.replace(/\D/g,'').slice(0,2); sync(); });
@@ -2415,6 +2438,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if(res==='bad'){ say('That code does not match that name. Check the code and try again.',true); code.select(); return; }
       if(res==='locked'){ say('Too many wrong tries. Wait ten minutes or ask your teacher.',true); return; }
       say(res==='ok'?'':'The code could not be checked right now. It will be checked when you submit.');
+      if(res==='ok') saveSess(sel.value,codeVal);
       verifiedOK=true; startBtn.click();
     });
   },true);
