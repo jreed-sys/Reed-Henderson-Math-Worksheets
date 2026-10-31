@@ -4525,6 +4525,96 @@ function setupScratchCanvas(){
   }).observe(document.body,{childList:true,subtree:true,characterData:true});
 })();
 
-</script><!--ROSTER-LOGIN-END-->
+</script><!--ROSTER-LOGIN-END--><!--AUTOSAVE-ADDON-START-->
+<script>
+/* TSIA2 Math Practice autosave: this page draws 12 random questions at Start, so the usual add-on cannot be used.
+   This block remembers WHICH questions were drawn, the answers, the question the student was on and the time spent,
+   under the same storage family as the other lessons (rhmw-autosave:<topic>::<name>). It wraps four page functions
+   (buildQuiz, renderQuiz, startTimer, showQuestion, annotateResults) and changes nothing else. Never throws. */
+(function(){
+  try{
+    if(window.__tsiaAutosave) return; window.__tsiaAutosave=true;
+    if(typeof buildQuiz!=='function'||typeof renderQuiz!=='function'||typeof startTimer!=='function'||typeof showQuestion!=='function'||typeof annotateResults!=='function'||typeof QUESTION_BANK==='undefined') return;
+    var PREFIX='rhmw-autosave:TSIA2 Math Practice::', MAXAGE=3*24*3600*1000;
+    var pending=null, curName='', off=false, started=false;
+    function norm(n){ return String(n==null?'':n).replace(/\s+/g,' ').trim().toLowerCase(); }
+    function nameNow(){ var e=document.getElementById('studentName'); return norm(e&&e.value); }
+    function sig(q){ return String(q.stem||'').replace(/\s+/g,' ').slice(0,60); }
+    function key(n){ return PREFIX+n; }
+    function load(n){
+      try{
+        var d=JSON.parse(localStorage.getItem(key(n))||'null');
+        if(!d||!d.ids||!d.sig||d.bankLen!==QUESTION_BANK.length||!d.ids.length||(d.t&&Date.now()-d.t>MAXAGE)) return null;
+        for(var i=0;i<d.ids.length;i++){ var q=QUESTION_BANK[d.ids[i]]; if(!q||sig(q)!==d.sig[i]) return null; }
+        return d;
+      }catch(e){ return null; }
+    }
+    function clearSaved(n){ try{ localStorage.removeItem(key(n)); }catch(e){} }
+    function answers(){ var a={}; document.querySelectorAll('#questionsContainer input[type=radio]:checked').forEach(function(r){ a[r.name]=r.value; }); return a; }
+    function chip(txt,bad){
+      var c=document.getElementById('asChip');
+      if(!c){ var t=document.getElementById('timerChip'); if(!t||!t.parentNode) return; c=document.createElement('span'); c.id='asChip'; c.style.cssText='font-size:12px;margin-left:8px;white-space:nowrap'; t.parentNode.insertBefore(c,t.nextSibling); }
+      c.textContent=txt; c.style.color=bad?'#c0392b':'#1f8a4c';
+    }
+    function save(){
+      try{
+        if(off||!started||(typeof graded!=='undefined'&&graded)) return;
+        if(!curName||curName==='practice'||!quiz||!quiz.length||!startTime) return;
+        var a=answers(); if(!Object.keys(a).length) return;
+        var ids=quiz.map(function(q){ return QUESTION_BANK.indexOf(q); }); if(ids.indexOf(-1)>=0) return;
+        localStorage.setItem(key(curName),JSON.stringify({v:1,t:Date.now(),bankLen:QUESTION_BANK.length,ids:ids,sig:quiz.map(sig),answers:a,index:currentIndex,elapsedMs:Date.now()-startTime.getTime()}));
+        var d=new Date(); chip('\u2713 Autosaved '+d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}));
+      }catch(e){ chip('Autosave problem',true); }
+    }
+    var origBuild=buildQuiz, origRender=renderQuiz, origTimer=startTimer, origShow=showQuestion, origAnnot=annotateResults;
+    window.buildQuiz=function(){
+      pending=null; curName=nameNow();
+      if(curName&&curName!=='practice'){
+        var d=load(curName);
+        if(d){
+          var ok=window.confirm('Welcome back! Saved work was found for this name.\n\nOK = continue where you left off\nCancel = start a new practice test');
+          if(ok){ pending=d; return d.ids.map(function(i){ return QUESTION_BANK[i]; }); }
+          clearSaved(curName);
+        }
+      }
+      return origBuild.apply(this,arguments);
+    };
+    window.renderQuiz=function(){
+      var r=origRender.apply(this,arguments);
+      try{
+        if(pending){
+          var a=pending.answers||{};
+          Object.keys(a).forEach(function(n){
+            var el=document.querySelector('#questionsContainer input[type=radio][name="'+n+'"][value="'+a[n]+'"]');
+            if(el){ el.checked=true; var row=el.closest('.choice-row'); if(row) row.classList.add('chosen'); }
+          });
+          if(typeof refreshDots==='function') refreshDots();
+          origShow(Math.min(Math.max(+pending.index||0,0),quiz.length-1));
+        }
+        var c=document.getElementById('questionsContainer');
+        if(c&&!c.__asWired){ c.__asWired=true; c.addEventListener('change',function(){ setTimeout(save,0); }); }
+      }catch(e){}
+      return r;
+    };
+    window.startTimer=function(){
+      try{ if(pending&&pending.elapsedMs>0) startTime=new Date(Date.now()-pending.elapsedMs); }catch(e){}
+      started=true;
+      var r=origTimer.apply(this,arguments);
+      if(pending) chip('\u2713 Continuing your saved work'); else chip('\u2713 Autosave on');
+      return r;
+    };
+    window.showQuestion=function(){ var r=origShow.apply(this,arguments); setTimeout(save,0); return r; };
+    window.annotateResults=function(){
+      var r=origAnnot.apply(this,arguments);
+      try{ off=true; clearSaved(curName); chip('\u2713 Submitted \u2014 saved copy cleared'); }catch(e){}
+      return r;
+    };
+    setInterval(save,15000);
+    document.addEventListener('visibilitychange',function(){ if(document.hidden) save(); });
+    window.addEventListener('pagehide',save);
+  }catch(err){}
+})();
+</script>
+<!--AUTOSAVE-ADDON-END-->
 </body>
 </html>
