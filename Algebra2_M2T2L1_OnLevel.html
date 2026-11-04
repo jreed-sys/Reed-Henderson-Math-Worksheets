@@ -2599,4 +2599,123 @@ document.addEventListener('DOMContentLoaded', () => {
   }).observe(document.body,{childList:true,subtree:true,characterData:true});
 })();
 
-</script><!--ROSTER-LOGIN-END-->
+</script><!--ROSTER-LOGIN-END--><!--RHMW-TOOLS-START--><script>
+/* RHMW storage cleanup v1: keeps the autosave space in this browser from filling up.
+   1) removes autosaves older than MAX_DAYS (and Practice-mode saves older than 1 day);
+   2) if saves still use more than BUDGET characters, removes the oldest saves until they fit.
+   Only touches keys that start with "rhmw-autosave:". Never throws. Safe to load on any page. */
+(function(){
+  var PREFIX='rhmw-autosave:', MAX_DAYS=30, BUDGET=3000000, DAY=864e5;
+  function run(keepPrefix){
+    var ls; try{ ls=window.localStorage; if(!ls) return 0; }catch(e){ return 0; }
+    var now=Date.now(), items=[], removed=0, i, k, raw, t, d;
+    try{
+      for(i=0;i<ls.length;i++){
+        k=ls.key(i); if(!k||k.indexOf(PREFIX)!==0) continue;
+        raw=ls.getItem(k)||''; t=0;
+        try{ d=JSON.parse(raw); t=Date.parse(d&&(d.savedAt||d.firstStartedAt))||0; }catch(e){ t=0; }
+        items.push({k:k,size:k.length+raw.length,t:t,practice:/::practice$/.test(k)});
+      }
+      var keep=[];
+      items.forEach(function(it){
+        if(keepPrefix&&it.k.indexOf(keepPrefix)===0){ keep.push(it); return; }
+        var age=it.t?now-it.t:0;
+        if((it.practice&&(!it.t||age>DAY))||(it.t&&age>MAX_DAYS*DAY)){ try{ ls.removeItem(it.k); removed++; }catch(e){} }
+        else keep.push(it);
+      });
+      var total=keep.reduce(function(s,it){ return s+it.size; },0);
+      keep.sort(function(a,b){ return a.t-b.t; });   /* oldest (or undated) first */
+      for(i=0;i<keep.length&&total>BUDGET;i++){
+        if(keepPrefix&&keep[i].k.indexOf(keepPrefix)===0) continue;
+        try{ ls.removeItem(keep[i].k); removed++; total-=keep[i].size; }catch(e){}
+      }
+    }catch(e){}
+    return removed;
+  }
+  window.rhmwStorageCleanup=run;
+  try{ run(typeof TOPIC_NAME==='string'?PREFIX+TOPIC_NAME+'::':null); }catch(e){}
+})();
+
+/* rhmw-mathinput v1: exponents in typed answers.
+   - Typing ^ and a number turns into a raised exponent as you type (x^3 -> x³, x^-1 -> x⁻¹).
+   - When a typed answer box has focus, a small bar offers ² ³ ⁴ buttons that insert at the cursor.
+   - Grading treats x³ and x^3 the same everywhere (normalize maps raised digits to ^n, and the
+     answer key gets the matching ^n forms), so either way of typing is accepted.
+   Never throws; does nothing on pages without typed answers. */
+(function(){
+  if(window.__rhmwMathInput) return; window.__rhmwMathInput=true;
+  var SUP={'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻'};
+  var UNSUP={}; Object.keys(SUP).forEach(function(k){ UNSUP[SUP[k]]=k; });
+  function supToCaret(s){ return String(s).replace(/[⁻]?[⁰¹²³⁴⁵⁶⁷⁸⁹]+/g,function(m){ return '^'+m.split('').map(function(c){ return UNSUP[c]; }).join(''); }); }
+  /* 1) grading: raised digits mean ^n */
+  try{
+    if(typeof normalize==='function'){
+      var baseNorm=normalize;
+      normalize=function(str){ return baseNorm(supToCaret(str||'')); };
+    }
+    if(typeof ANSWER_KEY!=='undefined'&&ANSWER_KEY&&ANSWER_KEY.forEach){
+      ANSWER_KEY.forEach(function(it){
+        if(!it||!it.correct||it.loose) return;   /* loose items re-normalize the key at grading time */
+        if(it.type==='exact'){
+          var add=[]; it.correct.forEach(function(c){ var v=normalize(c); if(typeof c==='string'&&it.correct.indexOf(v)<0&&add.indexOf(v)<0) add.push(v); });
+          it.correct=it.correct.concat(add);
+        } else if(it.type==='contains'){
+          it.correct=it.correct.map(function(g){ return g.concat(g.map(function(kw){ return supToCaret(kw); }).filter(function(v){ return g.indexOf(v)<0; })); });
+        }
+      });
+    }
+  }catch(e){}
+  /* 2) typing: ^n -> raised digits */
+  function isTyped(el){ return el&&el.tagName==='INPUT'&&el.classList&&el.classList.contains('ans')&&(!el.type||el.type==='text'); }
+  function convert(el){
+    var v=el.value; if(v.indexOf('^')<0) return;
+    var pos=el.selectionStart, before=v.slice(0,pos==null?v.length:pos);
+    var rep=function(s){ return s.replace(/\^(-?\d+)/g,function(m,d){ return d.split('').map(function(c){ return SUP[c]; }).join(''); }); };
+    var nv=rep(v); if(nv===v) return;
+    var nb=rep(before); el.value=nv;
+    try{ el.setSelectionRange(nb.length,nb.length); }catch(e){}
+  }
+  document.addEventListener('input',function(e){ try{ if(isTyped(e.target)) convert(e.target); }catch(err){} },true);
+  /* 3) exponent bar under the focused typed box */
+  var bar=null, cur=null;
+  function mkBar(){
+    bar=document.createElement('div'); bar.className='rhmw-expbar'; bar.setAttribute('role','toolbar'); bar.setAttribute('aria-label','Exponents');
+    bar.style.cssText='display:none;position:absolute;z-index:9999;align-items:center;gap:6px;flex-wrap:wrap;padding:5px 8px;background:#fff;border:1.5px solid #1f8a8a;border-radius:9px;box-shadow:0 3px 10px rgba(0,0,0,.15);font:500 12.5px Inter,sans-serif;color:#4a5a5a;max-width:calc(100vw - 16px);box-sizing:border-box;';
+    var h='<span>Exponent:</span>';
+    ['²','³','⁴'].forEach(function(s){ h+='<button type="button" data-sup="'+s+'" style="font:700 15px \'JetBrains Mono\',monospace;line-height:1.2;color:#0f4c4c;background:#d7ebe9;border:1.5px solid #1f8a8a;border-radius:7px;padding:0 9px;cursor:pointer">x'+s+'</button>'; });
+    h+='<span>or type <b>^3</b></span>';
+    bar.innerHTML=h; document.body.appendChild(bar);
+    window.addEventListener('resize',place);
+    bar.addEventListener('mousedown',function(e){ e.preventDefault(); });   /* keep the cursor in the box */
+    bar.addEventListener('click',function(e){
+      var b=e.target.closest&&e.target.closest('button[data-sup]'); if(!b||!cur) return;
+      var s=b.getAttribute('data-sup'), a=cur.selectionStart, z=cur.selectionEnd;
+      if(a==null){ a=z=cur.value.length; }
+      cur.value=cur.value.slice(0,a)+s+cur.value.slice(z);
+      try{ cur.setSelectionRange(a+s.length,a+s.length); }catch(err){}
+      cur.focus(); cur.dispatchEvent(new Event('input',{bubbles:true})); cur.dispatchEvent(new Event('change',{bubbles:true}));
+    });
+  }
+  function place(){
+    try{ if(!bar||!cur||bar.style.display==='none') return;
+      var r=cur.getBoundingClientRect(), vw=document.documentElement.clientWidth, w=bar.offsetWidth;
+      var left=Math.max(8,Math.min(r.left,vw-w-8));
+      bar.style.left=(left+window.pageXOffset)+'px'; bar.style.top=(r.bottom+window.pageYOffset+4)+'px';
+    }catch(e){}
+  }
+  document.addEventListener('focusin',function(e){
+    try{
+      var el=e.target; if(!isTyped(el)||el.disabled||el.readOnly) return;
+      if(!bar) mkBar();
+      cur=el; bar.style.display='flex'; place();
+    }catch(err){}
+  });
+  document.addEventListener('focusout',function(e){
+    try{ if(e.target===cur) setTimeout(function(){ if(bar&&document.activeElement!==cur) bar.style.display='none'; },150); }catch(err){}
+  });
+  /* 4) one line in the how-box */
+  function tip(){ try{ var hb=document.querySelector('.how-box'); if(hb&&!hb.querySelector('.rhmw-exptip')){ var p=document.createElement('span'); p.className='rhmw-exptip'; p.innerHTML=' <b>Exponents:</b> type <b>^</b> then the number (x^3 becomes x³), or use the x² x³ buttons that appear under an answer box.'; hb.appendChild(p); } }catch(e){} }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',tip); else tip();
+})();
+
+</script><!--RHMW-TOOLS-END-->
