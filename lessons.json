@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-03",
+"generated": "2026-11-04",
 "pages": {
 "Algebra2_M1T1L1.html": {
 "subject": "Algebra2",
@@ -690,6 +690,26 @@
 "subject": "Geometry",
 "id": "M3T2L2",
 "topic": "Geometry M3 T2 L2: Tangent Ratio and Inverse Tangent (On-Level)"
+},
+"Algebra2_M4T2L2.html": {
+"subject": "Algebra2",
+"id": "M4T2L2",
+"topic": "Algebra II M4 T2 L2: Radical Functions (Honors)"
+},
+"Algebra2_M4T2L2_OnLevel.html": {
+"subject": "Algebra2",
+"id": "M4T2L2",
+"topic": "Algebra II M4 T2 L2: Radical Functions (On-Level)"
+},
+"Geometry_M3T2L3.html": {
+"subject": "Geometry",
+"id": "M3T2L3",
+"topic": "Geometry M3 T2 L3: Exploring Sine and Cosine Ratios (Honors)"
+},
+"Geometry_M3T2L3_OnLevel.html": {
+"subject": "Geometry",
+"id": "M3T2L3",
+"topic": "Geometry M3 T2 L3: Exploring Sine and Cosine Ratios (On-Level)"
 }
 }
 }
