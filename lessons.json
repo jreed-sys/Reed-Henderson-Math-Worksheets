@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-05",
+"generated": "2026-11-06",
 "pages": {
 "Algebra2_M1T1L1.html": {
 "subject": "Algebra2",
@@ -805,6 +805,36 @@
 "subject": "Geometry",
 "id": "M4T1L2",
 "topic": "Geometry M4 T1 L2: Similarity Relationships in Circles (On-Level)"
+},
+"Algebra2_M1_ExitTicket.html": {
+"subject": "Algebra2",
+"id": "M1_ExitTicket",
+"topic": "Algebra II M1 Exit Ticket"
+},
+"Algebra2_M2_ExitTicket.html": {
+"subject": "Algebra2",
+"id": "M2_ExitTicket",
+"topic": "Algebra II M2 Exit Ticket"
+},
+"Algebra2_M3_ExitTicket.html": {
+"subject": "Algebra2",
+"id": "M3_ExitTicket",
+"topic": "Algebra II M3 Exit Ticket"
+},
+"Geometry_M1_ExitTicket.html": {
+"subject": "Geometry",
+"id": "M1_ExitTicket",
+"topic": "Geometry M1 Exit Ticket"
+},
+"Geometry_M2_ExitTicket.html": {
+"subject": "Geometry",
+"id": "M2_ExitTicket",
+"topic": "Geometry M2 Exit Ticket"
+},
+"Geometry_M3_ExitTicket.html": {
+"subject": "Geometry",
+"id": "M3_ExitTicket",
+"topic": "Geometry M3 Exit Ticket"
 }
 }
 }
