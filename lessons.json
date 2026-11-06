@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-04",
+"generated": "2026-11-05",
 "pages": {
 "Algebra2_M1T1L1.html": {
 "subject": "Algebra2",
@@ -745,6 +745,66 @@
 "subject": "Algebra2",
 "id": "M2T2L4",
 "topic": "Algebra II M2 T2 L4: Equation of a Parabola (On-Level)"
+},
+"Algebra2_M4T2L3.html": {
+"subject": "Algebra2",
+"id": "M4T2L3",
+"topic": "Algebra II M4 T2 L3: Transformations of Radical Functions (Honors)"
+},
+"Algebra2_M4T2L3_OnLevel.html": {
+"subject": "Algebra2",
+"id": "M4T2L3",
+"topic": "Algebra II M4 T2 L3: Transformations of Radical Functions (On-Level)"
+},
+"Geometry_M3T2L4.html": {
+"subject": "Geometry",
+"id": "M3T2L4",
+"topic": "Geometry M3 T2 L4: Complement Angle Relationships (Honors)"
+},
+"Geometry_M3T2L4_OnLevel.html": {
+"subject": "Geometry",
+"id": "M3T2L4",
+"topic": "Geometry M3 T2 L4: Complement Angle Relationships (On-Level)"
+},
+"Algebra2_M4T2L4.html": {
+"subject": "Algebra2",
+"id": "M4T2L4",
+"topic": "Algebra II M4 T2 L4: Compositions of Functions (Honors)"
+},
+"Algebra2_M4T2L4_OnLevel.html": {
+"subject": "Algebra2",
+"id": "M4T2L4",
+"topic": "Algebra II M4 T2 L4: Compositions of Functions (On-Level)"
+},
+"Geometry_M4T1L1.html": {
+"subject": "Geometry",
+"id": "M4T1L1",
+"topic": "Geometry M4 T1 L1: Tangents, Secants, and More Chords (Honors)"
+},
+"Geometry_M4T1L1_OnLevel.html": {
+"subject": "Geometry",
+"id": "M4T1L1",
+"topic": "Geometry M4 T1 L1: Tangents, Secants, and More Chords (On-Level)"
+},
+"Algebra2_M4T3L1.html": {
+"subject": "Algebra2",
+"id": "M4T3L1",
+"topic": "Algebra II M4 T3 L1: Rewriting Radical Expressions (Honors)"
+},
+"Algebra2_M4T3L1_OnLevel.html": {
+"subject": "Algebra2",
+"id": "M4T3L1",
+"topic": "Algebra II M4 T3 L1: Rewriting Radical Expressions (On-Level)"
+},
+"Geometry_M4T1L2.html": {
+"subject": "Geometry",
+"id": "M4T1L2",
+"topic": "Geometry M4 T1 L2: Similarity Relationships in Circles (Honors)"
+},
+"Geometry_M4T1L2_OnLevel.html": {
+"subject": "Geometry",
+"id": "M4T1L2",
+"topic": "Geometry M4 T1 L2: Similarity Relationships in Circles (On-Level)"
 }
 }
 }
