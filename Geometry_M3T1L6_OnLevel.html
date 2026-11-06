@@ -2107,29 +2107,44 @@ async function postToSheetWithRetry(payload, maxAttempts){
 
 /* ============ PDF export ============ */
 async function generatePDF(){
+  /* PDF v2 (2026-11-06): renders the page in page-sized pieces (JPEG) instead of one giant image.
+     One huge canvas is too big for many Chromebooks/iPads and came out as rainbow noise. */
   if(typeof html2canvas === 'undefined' || typeof window.jspdf === 'undefined'){
     throw new Error('PDF library did not load (likely blocked by a school network filter).');
   }
   const root = document.getElementById('pdfRoot');
-  const pdfScale = Math.min(2, 30000 / Math.max(1, root.scrollHeight));
-  const canvas = await html2canvas(root, {scale: pdfScale, backgroundColor:'#f7f4ec', useCORS:true});
-  const imgData = canvas.toDataURL('image/png');
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF({orientation:'p', unit:'pt', format:'letter', compress:true});
-  const pageWidth = pdf.internal.pageSize.getWidth();
-  const pageHeight = pdf.internal.pageSize.getHeight();
-  const imgWidth = pageWidth;
-  const imgHeight = canvas.height * (imgWidth / canvas.width);
-  let heightLeft = imgHeight;
-  let position = 0;
-  pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-  heightLeft -= pageHeight;
-  while(heightLeft > 0){
-    position = heightLeft - imgHeight;
-    pdf.addPage();
-    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
-  }
+  const pdfPageW = pdf.internal.pageSize.getWidth(), pdfPageH = pdf.internal.pageSize.getHeight();
+  const rootW = Math.max(1, root.scrollWidth || root.offsetWidth), rootH = Math.max(1, root.scrollHeight);
+  const pageCss = Math.floor(rootW * pdfPageH / pdfPageW);           // CSS px that fill one PDF page
+  const SLICE_PX = 9e6;                                               // max pixels in any one canvas
+  const sliceScale = Math.min(1.6, Math.sqrt(SLICE_PX / (rootW * pageCss)));
+  const perSlice = Math.max(1, Math.floor(SLICE_PX / (rootW * pageCss * sliceScale * sliceScale)));
+  const nPages = Math.ceil(rootH / pageCss);
+  const pdfBtn = document.getElementById('pdfBtn'), pdfBtnText = pdfBtn ? pdfBtn.textContent : '';
+  let firstPage = true;
+  try{
+    for(let p0 = 0; p0 < nPages; p0 += perSlice){
+      if(pdfBtn) pdfBtn.textContent = 'Building PDF\u2026 ' + Math.round(p0 / nPages * 100) + '%';
+      await new Promise(r => setTimeout(r, 20));
+      const sy = p0 * pageCss, shh = Math.min(perSlice * pageCss, rootH - sy);
+      const slice = await html2canvas(root, {scale: sliceScale, backgroundColor:'#f7f4ec', useCORS:true, x:0, y:sy, width:rootW, height:shh});
+      for(let k = 0; k * pageCss < shh; k++){
+        const ph = Math.min(pageCss, shh - k * pageCss);
+        const pc = document.createElement('canvas');
+        pc.width = slice.width; pc.height = Math.max(1, Math.round(ph * sliceScale));
+        const pctx = pc.getContext('2d');
+        pctx.fillStyle = '#f7f4ec'; pctx.fillRect(0, 0, pc.width, pc.height);
+        pctx.drawImage(slice, 0, Math.round(k * pageCss * sliceScale), slice.width, pc.height, 0, 0, pc.width, pc.height);
+        if(!firstPage) pdf.addPage();
+        firstPage = false;
+        pdf.addImage(pc.toDataURL('image/jpeg', 0.88), 'JPEG', 0, 0, pdfPageW, ph * pdfPageW / rootW);
+        pc.width = pc.height = 0;
+      }
+      slice.width = slice.height = 0;
+    }
+  } finally { if(pdfBtn) pdfBtn.textContent = pdfBtnText; }
   const safeName = (studentName||'student').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
   pdf.save(`${PDF_PREFIX}_${safeName}.pdf`);
 }
