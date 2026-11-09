@@ -109,6 +109,54 @@
   .level-pill.onlevel{background:#d7ebe9;color:#0f4c4c;}
   .switch{display:inline-block;margin-top:6px;font-size:13.5px;color:#fff;opacity:.9;}
   .switch a{color:#fff;font-weight:700;}
+
+  /* module accordion (2026-11-08) */
+  .subject.acc{padding:0;overflow:hidden;}
+  .acc > details > summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:14px;padding:20px 24px;}
+  .acc > details > summary::-webkit-details-marker,.topic > summary::-webkit-details-marker{display:none;}
+  .acc > details > summary:hover{background:#fbfaf6;}
+  .acc .mod-txt{flex:1;min-width:0;}
+  .acc .mod-num{display:block;font:700 12px/1.2 'Segoe UI',Helvetica,Arial,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--teal-500);margin-bottom:3px;}
+  .acc h2{margin:0;font-size:20px;color:var(--teal-900);}
+  .acc .mod-meta{display:block;font-size:13px;color:var(--ink-soft);margin-top:4px;}
+  .acc .chev{flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--teal-100);color:var(--teal-900);font-weight:700;transition:transform .2s ease;}
+  .acc > details[open] > summary .chev{transform:rotate(90deg);}
+  .acc > details[open] > summary{border-bottom:1px solid var(--line);}
+  .acc .mod-body{padding:14px 24px 20px;display:flex;flex-direction:column;gap:10px;}
+  .topic{border:1.5px solid var(--line);border-radius:10px;background:#fbfaf6;}
+  .topic > summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:12px 14px;font-weight:600;font-size:15px;}
+  .topic > summary:hover{background:var(--teal-100);border-radius:10px;}
+  .topic .t-num{flex:none;font:700 11px/1 'Segoe UI',Helvetica,Arial,sans-serif;letter-spacing:.05em;text-transform:uppercase;background:var(--teal-700);color:#fff;border-radius:999px;padding:5px 9px;}
+  .topic .t-txt{flex:1;min-width:0;display:flex;align-items:center;gap:10px;}
+  .topic .t-name{min-width:0;}
+  .acc a.lesson{position:relative;padding-right:40px;}
+  .acc a.lesson .arrow{position:absolute;right:14px;top:50%;transform:translateY(-50%);}
+  .topic .t-count{flex:none;font-size:12.5px;font-weight:600;color:var(--ink-soft);}
+  .topic .chev{width:24px;height:24px;font-size:13px;}
+  .topic[open] > summary .chev{transform:rotate(90deg);}
+  .topic[open]{background:#fff;}
+  .topic[open] > summary{border-bottom:1px dashed var(--line);border-radius:10px 10px 0 0;}
+  .topic > .t-body{padding:12px 14px 14px;}
+  .acc .exit-row{margin-top:4px;}
+  .acc a.lesson.exit{border-color:var(--answer-pink);background:#fdf1fb;}
+  .acc a.lesson.exit:hover{background:#fbe4f7;}
+  .acc a.lesson.exit .arrow{color:var(--answer-pink);}
+  .acc a.lesson.exit:before{content:'\2605  Exit ticket';flex-basis:100%;font:700 11px/1 'Segoe UI',Helvetica,Arial,sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--answer-pink);margin-bottom:-2px;}
+  .acc a.lesson.exit{flex-wrap:wrap;}
+  .acc-tools{display:flex;justify-content:flex-end;gap:8px;margin:18px 0 -12px;}
+  .acc-tools button{font:600 13px 'Segoe UI',Helvetica,Arial,sans-serif;border:1.5px solid var(--line);background:#fff;color:var(--teal-900);border-radius:999px;padding:6px 12px;cursor:pointer;}
+  .acc-tools button:hover{border-color:var(--teal-500);}
+  @media (max-width:600px){
+    .acc > details > summary{padding:16px 16px;}
+    .acc h2{font-size:17px;}
+    .acc .mod-body{padding:12px 14px 16px;}
+    .topic .t-count{display:none;}
+    .topic .t-txt{display:block;}
+    .topic .t-num{display:inline-block;margin-bottom:5px;}
+    .topic .t-name{display:block;}
+    .topic > .t-body{padding:10px 8px 10px;}
+    .topic > summary{padding:12px 10px;}
+  }
 </style>
 </head>
 <body>
@@ -130,147 +178,147 @@
 
 <div class="wrap">
 
-  <section class="subject">
-    <div class="sec-head"><h2>📐 Geometry — Explore</h2></div>
-    <p class="sub">Interactive tools for trying ideas out</p>
-    <div class="links">
+  <div class="acc-tools" id="accTools"><button type="button" data-a="open">Open all</button><button type="button" data-a="close">Close all</button></div>
+
+  <section class="subject acc" id="explore">
+    <details class="mod" id="explore-d">
+      <summary><span class="mod-txt"><h2>Explore</h2><span class="mod-meta">Interactive tools for trying ideas out</span></span><span class="chev">&#8250;</span></summary>
+      <div class="mod-body"><div class="links">
       <a class="lesson" href="Geometry_TriangleLengthExplorer.html">Can Any Three Lengths Make a Triangle? — stretch, swing, and test them <span class="arrow">→</span></a>
       <a class="lesson" href="Geometry_TriangleCongruenceExplorer.html">Triangle Congruence Explorer — which parts are enough to make congruent triangles? <span class="arrow">→</span></a>
-    </div>
+    </div></div>
+    </details>
   </section>
 
-  <section class="subject">
-    <div class="sec-head"><h2>📐 Geometry — Module 1, Topic 1</h2></div>
-    <p class="sub">Foundations of points, lines, planes, and logical reasoning</p>
-    <div class="links">
+  <section class="subject acc" id="m1">
+    <details class="mod" id="m1-d">
+      <summary><span class="mod-txt"><span class="mod-num">Module 1</span><h2>Reasoning, Coordinates, Transformations, and Congruence</h2><span class="mod-meta">4 topics &middot; 14 lessons &middot; exit ticket</span></span><span class="chev">&#8250;</span></summary>
+      <div class="mod-body">
+      <details class="topic" id="m1t1">
+        <summary><span class="t-txt"><span class="t-num">Topic 1</span><span class="t-name">Foundations of points, lines, planes, and logical reasoning</span></span><span class="t-count">3 lessons</span><span class="chev">&#8250;</span></summary>
+        <div class="t-body"><div class="links">
       <a class="lesson" href="Geometry_M1T1L1_OnLevel.html">Lesson 1 — Points, Lines, Planes, Rays, and Line Segments <span class="arrow">→</span></a>
       <a class="lesson" href="Geometry_M1T1L2_OnLevel.html">Lesson 2 — Formal Reasoning in Euclidean Geometry <span class="arrow">→</span></a>
       <a class="lesson" href="Geometry_M1T1L3_OnLevel.html">Lesson 3 — Making Conjectures and Deductive Reasoning <span class="arrow">→</span></a>
-    </div>
-  </section>
-
-  <section class="subject">
-    <div class="sec-head"><h2>📐 Geometry — Module 1, Topic 2</h2></div>
-    <p class="sub">Coordinate geometry: constructing the plane, parallel/perpendicular lines, and classifying quadrilaterals</p>
-    <div class="links">
+    </div></div>
+      </details>
+      <details class="topic" id="m1t2">
+        <summary><span class="t-txt"><span class="t-num">Topic 2</span><span class="t-name">Coordinate geometry: constructing the plane, parallel/perpendicular lines, and classifying quadrilaterals</span></span><span class="t-count">3 lessons</span><span class="chev">&#8250;</span></summary>
+        <div class="t-body"><div class="links">
       <a class="lesson" href="Geometry_M1T2L1_OnLevel.html">Lesson 1 — Constructing a Coordinate Plane <span class="arrow">→</span></a>
       <a class="lesson" href="Geometry_M1T2L2_OnLevel.html">Lesson 2 — Parallel and Perpendicular Lines <span class="arrow">→</span></a>
       <a class="lesson" href="Geometry_M1T2L4_OnLevel.html">Lesson 4 — Classifying Triangles on the Coordinate Plane <span class="arrow">→</span></a>
-    </div>
-  </section>
-
-  <section class="subject">
-    <div class="sec-head"><h2>📐 Geometry — Module 1, Topic 3</h2></div>
-    <p class="sub">Sequences of rigid motions: translations, reflections, rotations, and compositions of rigid motions (with the lesson video)</p>
-    <div class="links">
+    </div></div>
+      </details>
+      <details class="topic" id="m1t3">
+        <summary><span class="t-txt"><span class="t-num">Topic 3</span><span class="t-name">Sequences of rigid motions: translations, reflections, rotations, and compositions of rigid motions (with the lesson video)</span></span><span class="t-count">5 lessons</span><span class="chev">&#8250;</span></summary>
+        <div class="t-body"><div class="links">
       <a class="lesson" href="Geometry_M1T3L1_OnLevel.html">Lesson 1 — Translations On and Off the Coordinate Plane <span class="arrow">→</span></a>
       <a class="lesson" href="Geometry_M1T3L2_OnLevel.html">Lesson 2 — Sequences of Multiple Translations <span class="arrow">→</span></a>
       <a class="lesson" href="Geometry_M1T3L3_OnLevel.html">Lesson 3 — Reflections On and Off the Coordinate Plane <span class="arrow">→</span></a>
       <a class="lesson" href="Geometry_M1T3L4_OnLevel.html">Lesson 4 — Rotations On and Off the Coordinate Plane <span class="arrow">→</span></a>
       <a class="lesson" href="Geometry_M1T3L5_OnLevel.html">Lesson 5 — Compositions of Functions <span class="arrow">→</span></a>
-    </div>
-  </section>
-
-  <section class="subject">
-    <div class="sec-head"><h2>📐 Geometry — Module 1, Topic 4</h2></div>
-    <p class="sub">Symmetry and triangle congruence</p>
-    <div class="links">
+    </div></div>
+      </details>
+      <details class="topic" id="m1t4">
+        <summary><span class="t-txt"><span class="t-num">Topic 4</span><span class="t-name">Symmetry and triangle congruence</span></span><span class="t-count">3 lessons</span><span class="chev">&#8250;</span></summary>
+        <div class="t-body"><div class="links">
       <a class="lesson" href="Geometry_M1T4L1_OnLevel.html">Lesson 1 — Reflectional and Rotational Symmetry <span class="arrow">→</span></a>
       <a class="lesson" href="Geometry_M1T4L2_OnLevel.html">Lesson 2 — Proving Triangle Congruence Theorems <span class="arrow">→</span></a>
       <a class="lesson" href="Geometry_M1T4L3_OnLevel.html">Lesson 3 — Using Triangle Congruence to Solve Problems <span class="arrow">→</span></a>
-    </div>
+    </div></div>
+      </details>
+      <div class="exit-row"><div class="links">
+      <a class="lesson exit" href="Geometry_M1_ExitTicket.html">Module 1 Exit Ticket — Reasoning, Coordinates, Transformations, and Congruence <span class="arrow">→</span></a>
+    </div></div>
+      </div>
+    </details>
   </section>
 
-  <section class="subject">
-    <div class="sec-head"><h2>📐 Geometry — Module 1 Exit Ticket</h2></div>
-    <p class="sub">Check your understanding of all of Module 1: a practice set, then 10 graded questions</p>
-    <div class="links">
-      <a class="lesson" href="Geometry_M1_ExitTicket.html">Module 1 Exit Ticket — Reasoning, Coordinates, Transformations, and Congruence <span class="arrow">→</span></a>
-    </div>
-  </section>
-
-  <section class="subject">
-    <div class="sec-head"><h2>📐 Geometry — Module 2, Topic 1</h2></div>
-    <p class="sub">Conjectures with circles, quadrilaterals, inscribed regular polygons, triangles, and points of concurrency</p>
-    <div class="links">
+  <section class="subject acc" id="m2">
+    <details class="mod" id="m2-d">
+      <summary><span class="mod-txt"><span class="mod-num">Module 2</span><h2>Conjectures, Proof, Angles, and Circles</h2><span class="mod-meta">3 topics &middot; 14 lessons &middot; exit ticket</span></span><span class="chev">&#8250;</span></summary>
+      <div class="mod-body">
+      <details class="topic" id="m2t1">
+        <summary><span class="t-txt"><span class="t-num">Topic 1</span><span class="t-name">Conjectures with circles, quadrilaterals, inscribed regular polygons, triangles, and points of concurrency</span></span><span class="t-count">5 lessons</span><span class="chev">&#8250;</span></summary>
+        <div class="t-body"><div class="links">
       <a class="lesson" href="Geometry_M2T1L1_OnLevel.html">Lesson 1 — Using Circles to Make Conjectures <span class="arrow">→</span></a>
       <a class="lesson" href="Geometry_M2T1L2_OnLevel.html">Lesson 2 — Conjectures About Quadrilaterals <span class="arrow">→</span></a>
       <a class="lesson" href="Geometry_M2T1L3_OnLevel.html">Lesson 3 — Constructing an Inscribed Regular Polygon <span class="arrow">→</span></a>
       <a class="lesson" href="Geometry_M2T1L4_OnLevel.html">Lesson 4 — Conjectures About Triangles <span class="arrow">→</span></a>
       <a class="lesson" href="Geometry_M2T1L5_OnLevel.html">Lesson 5 — Points of Concurrency <span class="arrow">→</span></a>
-    </div>
-  </section>
-
-  <section class="subject">
-    <div class="sec-head"><h2>📐 Geometry — Module 2, Topic 2</h2></div>
-    <p class="sub">Proof: forms of proof, parallel line theorems, polygon angles, isosceles triangles and special right triangles, indirect proof, and angles in circles</p>
-    <div class="links">
+    </div></div>
+      </details>
+      <details class="topic" id="m2t2">
+        <summary><span class="t-txt"><span class="t-num">Topic 2</span><span class="t-name">Proof: forms of proof, parallel line theorems, polygon angles, isosceles triangles and special right triangles, indirect proof, and angles in circles</span></span><span class="t-count">6 lessons</span><span class="chev">&#8250;</span></summary>
+        <div class="t-body"><div class="links">
       <a class="lesson" href="Geometry_M2T2L1_OnLevel.html">Lesson 1 — Forms of Proof <span class="arrow">→</span></a>
       <a class="lesson" href="Geometry_M2T2L2_OnLevel.html">Lesson 2 — Proving Parallel Line Theorems <span class="arrow">→</span></a>
       <a class="lesson" href="Geometry_M2T2L3_OnLevel.html">Lesson 3 — Interior and Exterior Angles of Polygons <span class="arrow">→</span></a>
       <a class="lesson" href="Geometry_M2T2L4_OnLevel.html">Lesson 4 — Perpendicular Bisector and Isosceles Triangle Theorems <span class="arrow">→</span></a>
       <a class="lesson" href="Geometry_M2T2L5_OnLevel.html">Lesson 5 — Inverse, Contrapositive, Direct Proof, and Indirect Proof <span class="arrow">→</span></a>
       <a class="lesson" href="Geometry_M2T2L6_OnLevel.html">Lesson 6 — Angle Relationships Inside and Outside Circles <span class="arrow">→</span></a>
-    </div>
-  </section>
-
-  <section class="subject">
-    <div class="sec-head"><h2>📐 Geometry — Module 2, Topic 3</h2></div>
-    <p class="sub">Using congruence theorems: right-triangle congruence (HL, LL, HA, LA), chords and tangents, and properties of quadrilaterals</p>
-    <div class="links">
+    </div></div>
+      </details>
+      <details class="topic" id="m2t3">
+        <summary><span class="t-txt"><span class="t-num">Topic 3</span><span class="t-name">Using congruence theorems: right-triangle congruence (HL, LL, HA, LA), chords and tangents, and properties of quadrilaterals</span></span><span class="t-count">3 lessons</span><span class="chev">&#8250;</span></summary>
+        <div class="t-body"><div class="links">
       <a class="lesson" href="Geometry_M2T3L1_OnLevel.html">Lesson 1 — Using Triangle Congruence to Determine Relationships Between Segments <span class="arrow">→</span></a>
       <a class="lesson" href="Geometry_M2T3L2_OnLevel.html">Lesson 2 — Using Congruent Triangles to Determine Relationships Between Chords and Tangents <span class="arrow">→</span></a>
       <a class="lesson" href="Geometry_M2T3L3_OnLevel.html">Lesson 3 — Properties of Quadrilaterals <span class="arrow">→</span></a>
-    </div>
+    </div></div>
+      </details>
+      <div class="exit-row"><div class="links">
+      <a class="lesson exit" href="Geometry_M2_ExitTicket.html">Module 2 Exit Ticket — Conjectures, Proof, Angles, and Circles <span class="arrow">→</span></a>
+    </div></div>
+      </div>
+    </details>
   </section>
 
-  <section class="subject">
-    <div class="sec-head"><h2>📐 Geometry — Module 2 Exit Ticket</h2></div>
-    <p class="sub">Check your understanding of all of Module 2: a practice set, then 10 graded questions</p>
-    <div class="links">
-      <a class="lesson" href="Geometry_M2_ExitTicket.html">Module 2 Exit Ticket — Conjectures, Proof, Angles, and Circles <span class="arrow">→</span></a>
-    </div>
-  </section>
-
-  <section class="subject">
-    <div class="sec-head"><h2>📐 Geometry — Module 3, Topic 1</h2></div>
-    <p class="sub">Similarity: dilations, triangle similarity criteria, proportionality theorems, right-triangle similarity, and indirect measurement</p>
-    <div class="links">
+  <section class="subject acc" id="m3">
+    <details class="mod" id="m3-d">
+      <summary><span class="mod-txt"><span class="mod-num">Module 3</span><h2>Similarity and Trigonometry</h2><span class="mod-meta">2 topics &middot; 10 lessons &middot; exit ticket</span></span><span class="chev">&#8250;</span></summary>
+      <div class="mod-body">
+      <details class="topic" id="m3t1">
+        <summary><span class="t-txt"><span class="t-num">Topic 1</span><span class="t-name">Similarity: dilations, triangle similarity criteria, proportionality theorems, right-triangle similarity, and indirect measurement</span></span><span class="t-count">6 lessons</span><span class="chev">&#8250;</span></summary>
+        <div class="t-body"><div class="links">
       <a class="lesson" href="Geometry_M3T1L1_OnLevel.html">Lesson 1 — Dilating Figures to Create Similar Figures <span class="arrow">→</span></a>
       <a class="lesson" href="Geometry_M3T1L2_OnLevel.html">Lesson 2 — Establishing Triangle Similarity Criteria <span class="arrow">→</span></a>
       <a class="lesson" href="Geometry_M3T1L3_OnLevel.html">Lesson 3 — Theorems About Proportionality <span class="arrow">→</span></a>
       <a class="lesson" href="Geometry_M3T1L4_OnLevel.html">Lesson 4 — More Similar Triangles <span class="arrow">→</span></a>
       <a class="lesson" href="Geometry_M3T1L5_OnLevel.html">Lesson 5 — Application of Similar Triangles <span class="arrow">→</span></a>
       <a class="lesson" href="Geometry_M3T1L6_OnLevel.html">Lesson 6 — Partitioning Segments in Given Ratios <span class="arrow">→</span></a>
-    </div>
-  </section>
-
-  <section class="subject">
-    <div class="sec-head"><h2>📐 Geometry — Module 3, Topic 2</h2></div>
-    <p class="sub">Trigonometry: constant side-length ratios in similar right triangles, tangent, sine, and cosine</p>
-    <div class="links">
+    </div></div>
+      </details>
+      <details class="topic" id="m3t2">
+        <summary><span class="t-txt"><span class="t-num">Topic 2</span><span class="t-name">Trigonometry: constant side-length ratios in similar right triangles, tangent, sine, and cosine</span></span><span class="t-count">4 lessons</span><span class="chev">&#8250;</span></summary>
+        <div class="t-body"><div class="links">
       <a class="lesson" href="Geometry_M3T2L1_OnLevel.html">Lesson 1 — Introduction to Trigonometry <span class="arrow">→</span></a>
       <a class="lesson" href="Geometry_M3T2L2_OnLevel.html">Lesson 2 — Tangent Ratio and Inverse Tangent <span class="arrow">→</span></a>
       <a class="lesson" href="Geometry_M3T2L3_OnLevel.html">Lesson 3 — Exploring Sine and Cosine Ratios <span class="arrow">→</span></a>
       <a class="lesson" href="Geometry_M3T2L4_OnLevel.html">Lesson 4 — Complement Angle Relationships <span class="arrow">→</span></a>
-    </div>
+    </div></div>
+      </details>
+      <div class="exit-row"><div class="links">
+      <a class="lesson exit" href="Geometry_M3_ExitTicket.html">Module 3 Exit Ticket — Similarity and Trigonometry <span class="arrow">→</span></a>
+    </div></div>
+      </div>
+    </details>
   </section>
 
-  <section class="subject">
-    <div class="sec-head"><h2>📐 Geometry — Module 3 Exit Ticket</h2></div>
-    <p class="sub">Check your understanding of all of Module 3: a practice set, then 10 graded questions</p>
-    <div class="links">
-      <a class="lesson" href="Geometry_M3_ExitTicket.html">Module 3 Exit Ticket — Similarity and Trigonometry <span class="arrow">→</span></a>
-    </div>
-  </section>
-
-  <section class="subject">
-    <div class="sec-head"><h2>📐 Geometry — Module 4, Topic 1</h2></div>
-    <p class="sub">Circles: tangents, secants, chords, sectors, and the equation of a circle</p>
-    <div class="links">
+  <section class="subject acc" id="m4">
+    <details class="mod" id="m4-d">
+      <summary><span class="mod-txt"><span class="mod-num">Module 4</span><h2>Circles</h2><span class="mod-meta">1 topic &middot; 2 lessons</span></span><span class="chev">&#8250;</span></summary>
+      <div class="mod-body">
+      <details class="topic" id="m4t1">
+        <summary><span class="t-txt"><span class="t-num">Topic 1</span><span class="t-name">Circles: tangents, secants, chords, sectors, and the equation of a circle</span></span><span class="t-count">2 lessons</span><span class="chev">&#8250;</span></summary>
+        <div class="t-body"><div class="links">
       <a class="lesson" href="Geometry_M4T1L1_OnLevel.html">Lesson 1 — Tangents, Secants, and More Chords <span class="arrow">→</span></a>
       <a class="lesson" href="Geometry_M4T1L2_OnLevel.html">Lesson 2 — Similarity Relationships in Circles <span class="arrow">→</span></a>
-    </div>
+    </div></div>
+      </details>
+      </div>
+    </details>
   </section>
 
 </div>
@@ -284,6 +332,57 @@
   window.addEventListener('scroll',update,{passive:true});
   window.addEventListener('resize',update);
   update();
+})();
+</script>
+<script>
+/* MODULE ACCORDION (2026-11-08): modules and topics open on click; the open ones are remembered for this tab.
+   #m3 in the address opens Module 3. With a schedule filter on (Due this week, Past due ...), every card with a
+   matching lesson opens and empty topics hide; Clear filters puts the cards back. With no saved state, the module
+   with the next due lesson opens by itself. */
+(function(){
+  var KEY='rh-acc:'+(location.pathname.split('/').pop()||''), filtering=false, saved=null;
+  var all=function(){ return [].slice.call(document.querySelectorAll('details.mod, details.topic')); };
+  function save(){ if(filtering) return; try{ sessionStorage.setItem(KEY, JSON.stringify(all().filter(function(d){ return d.open; }).map(function(d){ return d.id; }))); }catch(e){} }
+  function restore(ids){ all().forEach(function(d){ d.open = ids.indexOf(d.id) >= 0; }); }
+  var st=null; try{ st=JSON.parse(sessionStorage.getItem(KEY)||'null'); }catch(e){}
+  var h=(location.hash||'').replace('#','');
+  if(/^m\d+$/.test(h) && document.getElementById(h+'-d')){ document.getElementById(h+'-d').open=true; }
+  else if(st) restore(st);
+  document.addEventListener('toggle', function(e){ if(e.target.matches && e.target.matches('details.mod, details.topic')) save(); }, true);
+  var tools=document.getElementById('accTools');
+  if(tools) tools.addEventListener('click', function(e){
+    var b=e.target.closest('button'); if(!b) return;
+    var open=b.getAttribute('data-a')==='open';
+    document.querySelectorAll('details.mod').forEach(function(d){ d.open=open; });
+    if(!open) document.querySelectorAll('details.topic').forEach(function(d){ d.open=false; });
+    save();
+  });
+  function visible(a){ return a.style.display!=='none'; }
+  var autoDone=false;
+  function sync(){
+    var rb=document.getElementById('rhBox'); if(rb && tools && rb.nextElementSibling!==tools && !sync.moved){ sync.moved=true; rb.parentNode.insertBefore(tools, rb.nextSibling); }
+    var cnt=document.getElementById('rhCount'), active=!!(cnt && /Showing/.test(cnt.textContent||''));
+    if(active && !filtering){ saved=all().filter(function(d){ return d.open; }).map(function(d){ return d.id; }); filtering=true; }
+    document.querySelectorAll('details.topic').forEach(function(t){
+      var ls=[].slice.call(t.querySelectorAll('a.lesson')), any=ls.some(visible);
+      t.style.display=(active && !any)?'none':'';
+      if(active) t.open=any;
+    });
+    if(active) document.querySelectorAll('details.mod').forEach(function(m){ m.open=[].slice.call(m.querySelectorAll('a.lesson')).some(visible); });
+    if(!active && filtering){ filtering=false; if(saved) restore(saved); saved=null; }
+    if(!autoDone && !st && !/^m\d+$/.test(h) && document.querySelector('.rh-due')){
+      autoDone=true;
+      var now=new Date(), best=null, bestT=Infinity;
+      [].slice.call(document.querySelectorAll('.rh-due')).forEach(function(s){
+        var mm=/^Due \w+, (\w+) (\d+)/.exec(s.textContent||''); if(!mm) return;
+        var d=new Date(mm[1]+' '+mm[2]+' '+now.getFullYear()); if(isNaN(d)) return;
+        if(d-now < -180*864e5) d.setFullYear(d.getFullYear()+1);
+        if(d<bestT){ bestT=d; best=s; }
+      });
+      if(best){ var t=best.closest('details.topic'), m=best.closest('details.mod'); if(m) m.open=true; if(t) t.open=true; }
+    }
+  }
+  new MutationObserver(function(){ clearTimeout(sync.t); sync.t=setTimeout(sync, 30); }).observe(document.body, {subtree:true, childList:true, attributes:true, attributeFilter:['style']});
 })();
 </script>
 <script src="storage-cleanup.js"></script>

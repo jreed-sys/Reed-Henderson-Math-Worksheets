@@ -109,6 +109,54 @@
   .level-pill.onlevel{background:#d7ebe9;color:#0f4c4c;}
   .switch{display:inline-block;margin-top:6px;font-size:13.5px;color:#fff;opacity:.9;}
   .switch a{color:#fff;font-weight:700;}
+
+  /* module accordion (2026-11-08) */
+  .subject.acc{padding:0;overflow:hidden;}
+  .acc > details > summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:14px;padding:20px 24px;}
+  .acc > details > summary::-webkit-details-marker,.topic > summary::-webkit-details-marker{display:none;}
+  .acc > details > summary:hover{background:#fbfaf6;}
+  .acc .mod-txt{flex:1;min-width:0;}
+  .acc .mod-num{display:block;font:700 12px/1.2 'Segoe UI',Helvetica,Arial,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--teal-500);margin-bottom:3px;}
+  .acc h2{margin:0;font-size:20px;color:var(--teal-900);}
+  .acc .mod-meta{display:block;font-size:13px;color:var(--ink-soft);margin-top:4px;}
+  .acc .chev{flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--teal-100);color:var(--teal-900);font-weight:700;transition:transform .2s ease;}
+  .acc > details[open] > summary .chev{transform:rotate(90deg);}
+  .acc > details[open] > summary{border-bottom:1px solid var(--line);}
+  .acc .mod-body{padding:14px 24px 20px;display:flex;flex-direction:column;gap:10px;}
+  .topic{border:1.5px solid var(--line);border-radius:10px;background:#fbfaf6;}
+  .topic > summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:12px 14px;font-weight:600;font-size:15px;}
+  .topic > summary:hover{background:var(--teal-100);border-radius:10px;}
+  .topic .t-num{flex:none;font:700 11px/1 'Segoe UI',Helvetica,Arial,sans-serif;letter-spacing:.05em;text-transform:uppercase;background:var(--teal-700);color:#fff;border-radius:999px;padding:5px 9px;}
+  .topic .t-txt{flex:1;min-width:0;display:flex;align-items:center;gap:10px;}
+  .topic .t-name{min-width:0;}
+  .acc a.lesson{position:relative;padding-right:40px;}
+  .acc a.lesson .arrow{position:absolute;right:14px;top:50%;transform:translateY(-50%);}
+  .topic .t-count{flex:none;font-size:12.5px;font-weight:600;color:var(--ink-soft);}
+  .topic .chev{width:24px;height:24px;font-size:13px;}
+  .topic[open] > summary .chev{transform:rotate(90deg);}
+  .topic[open]{background:#fff;}
+  .topic[open] > summary{border-bottom:1px dashed var(--line);border-radius:10px 10px 0 0;}
+  .topic > .t-body{padding:12px 14px 14px;}
+  .acc .exit-row{margin-top:4px;}
+  .acc a.lesson.exit{border-color:var(--answer-pink);background:#fdf1fb;}
+  .acc a.lesson.exit:hover{background:#fbe4f7;}
+  .acc a.lesson.exit .arrow{color:var(--answer-pink);}
+  .acc a.lesson.exit:before{content:'\2605  Exit ticket';flex-basis:100%;font:700 11px/1 'Segoe UI',Helvetica,Arial,sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--answer-pink);margin-bottom:-2px;}
+  .acc a.lesson.exit{flex-wrap:wrap;}
+  .acc-tools{display:flex;justify-content:flex-end;gap:8px;margin:18px 0 -12px;}
+  .acc-tools button{font:600 13px 'Segoe UI',Helvetica,Arial,sans-serif;border:1.5px solid var(--line);background:#fff;color:var(--teal-900);border-radius:999px;padding:6px 12px;cursor:pointer;}
+  .acc-tools button:hover{border-color:var(--teal-500);}
+  @media (max-width:600px){
+    .acc > details > summary{padding:16px 16px;}
+    .acc h2{font-size:17px;}
+    .acc .mod-body{padding:12px 14px 16px;}
+    .topic .t-count{display:none;}
+    .topic .t-txt{display:block;}
+    .topic .t-num{display:inline-block;margin-bottom:5px;}
+    .topic .t-name{display:block;}
+    .topic > .t-body{padding:10px 8px 10px;}
+    .topic > summary{padding:12px 10px;}
+  }
 </style>
 </head>
 <body>
@@ -130,147 +178,148 @@
 
 <div class="wrap">
 
-  <section class="subject">
-    <div class="sec-head"><h2>📘 Algebra II — Module 1, Topic 1</h2></div>
-    <p class="sub">Defining and transforming absolute value functions</p>
-    <div class="links">
+  <div class="acc-tools" id="accTools"><button type="button" data-a="open">Open all</button><button type="button" data-a="close">Close all</button></div>
+
+  <section class="subject acc" id="m1">
+    <details class="mod" id="m1-d">
+      <summary><span class="mod-txt"><span class="mod-num">Module 1</span><h2>Absolute Value, Systems, and Inverses</h2><span class="mod-meta">2 topics &middot; 3 lessons &middot; exit ticket</span></span><span class="chev">&#8250;</span></summary>
+      <div class="mod-body">
+      <details class="topic" id="m1t1">
+        <summary><span class="t-txt"><span class="t-num">Topic 1</span><span class="t-name">Defining and transforming absolute value functions</span></span><span class="t-count">2 lessons</span><span class="chev">&#8250;</span></summary>
+        <div class="t-body"><div class="links">
       <a class="lesson" href="Algebra2_M1T1L1_OnLevel.html">Lesson 1 — Defining Absolute Value Functions <span class="arrow">→</span></a>
       <a class="lesson" href="Algebra2_M1T1L2_OnLevel.html">Lesson 2 — Transformations of Absolute Value Functions <span class="arrow">→</span></a>
-    </div>
-  </section>
-
-  <section class="subject">
-    <div class="sec-head"><h2>📘 Algebra II — Module 1, Topic 2</h2></div>
-    <p class="sub">Solving systems of equations and optimization</p>
-    <div class="links">
+    </div></div>
+      </details>
+      <details class="topic" id="m1t2">
+        <summary><span class="t-txt"><span class="t-num">Topic 2</span><span class="t-name">Solving systems of equations and optimization</span></span><span class="t-count">1 lesson</span><span class="chev">&#8250;</span></summary>
+        <div class="t-body"><div class="links">
       <a class="lesson" href="Algebra2_M1T2L4_OnLevel.html">Lesson 4 — Inverses of Linear Functions <span class="arrow">→</span></a>
-    </div>
+    </div></div>
+      </details>
+      <div class="exit-row"><div class="links">
+      <a class="lesson exit" href="Algebra2_M1_ExitTicket.html">Module 1 Exit Ticket — Absolute Value, Systems, and Inverses <span class="arrow">→</span></a>
+    </div></div>
+      </div>
+    </details>
   </section>
 
-  <section class="subject">
-    <div class="sec-head"><h2>📘 Algebra II — Module 1 Exit Ticket</h2></div>
-    <p class="sub">Check your understanding of all of Module 1: a practice set, then 10 graded questions</p>
-    <div class="links">
-      <a class="lesson" href="Algebra2_M1_ExitTicket.html">Module 1 Exit Ticket — Absolute Value, Systems, and Inverses <span class="arrow">→</span></a>
-    </div>
-  </section>
-
-  <section class="subject">
-    <div class="sec-head"><h2>📘 Algebra II — Module 2, Topic 1</h2></div>
-    <p class="sub">Quadratic functions, imaginary numbers, and complex numbers</p>
-    <div class="links">
+  <section class="subject acc" id="m2">
+    <details class="mod" id="m2-d">
+      <summary><span class="mod-txt"><span class="mod-num">Module 2</span><h2>Quadratic Functions and Complex Numbers</h2><span class="mod-meta">2 topics &middot; 8 lessons &middot; exit ticket</span></span><span class="chev">&#8250;</span></summary>
+      <div class="mod-body">
+      <details class="topic" id="m2t1">
+        <summary><span class="t-txt"><span class="t-num">Topic 1</span><span class="t-name">Quadratic functions, imaginary numbers, and complex numbers</span></span><span class="t-count">4 lessons</span><span class="chev">&#8250;</span></summary>
+        <div class="t-body"><div class="links">
       <a class="lesson" href="Algebra2_M2T1L1_OnLevel.html">Lesson 1 — Forms of Quadratic Functions <span class="arrow">→</span></a>
       <a class="lesson" href="Algebra2_M2T1L2_OnLevel.html">Lesson 2 — Writing Quadratic Functions <span class="arrow">→</span></a>
       <a class="lesson" href="Algebra2_M2T1L3_OnLevel.html">Lesson 3 — Solving Quadratic Equations <span class="arrow">→</span></a>
       <a class="lesson" href="Algebra2_M2T1L4_OnLevel.html">Lesson 4 — Imaginary and Complex Numbers <span class="arrow">→</span></a>
-    </div>
-  </section>
-
-  <section class="subject">
-    <div class="sec-head"><h2>📘 Algebra II — Module 2, Topic 2</h2></div>
-    <p class="sub">Quadratic inequalities, systems, regression models and parabolas</p>
-    <div class="links">
+    </div></div>
+      </details>
+      <details class="topic" id="m2t2">
+        <summary><span class="t-txt"><span class="t-num">Topic 2</span><span class="t-name">Quadratic inequalities, systems, regression models and parabolas</span></span><span class="t-count">4 lessons</span><span class="chev">&#8250;</span></summary>
+        <div class="t-body"><div class="links">
       <a class="lesson" href="Algebra2_M2T2L1_OnLevel.html">Lesson 1 — Solving Quadratic Inequalities <span class="arrow">→</span></a>
       <a class="lesson" href="Algebra2_M2T2L2_OnLevel.html">Lesson 2 — Systems of Linear and Quadratic Equations <span class="arrow">→</span></a>
       <a class="lesson" href="Algebra2_M2T2L3_OnLevel.html">Lesson 3 — Modeling with Linear and Quadratic Functions <span class="arrow">→</span></a>
       <a class="lesson" href="Algebra2_M2T2L4_OnLevel.html">Lesson 4 — Equation of a Parabola <span class="arrow">→</span></a>
-    </div>
+    </div></div>
+      </details>
+      <div class="exit-row"><div class="links">
+      <a class="lesson exit" href="Algebra2_M2_ExitTicket.html">Module 2 Exit Ticket — Quadratic Functions and Complex Numbers <span class="arrow">→</span></a>
+    </div></div>
+      </div>
+    </details>
   </section>
 
-  <section class="subject">
-    <div class="sec-head"><h2>📘 Algebra II — Module 2 Exit Ticket</h2></div>
-    <p class="sub">Check your understanding of all of Module 2: a practice set, then 10 graded questions</p>
-    <div class="links">
-      <a class="lesson" href="Algebra2_M2_ExitTicket.html">Module 2 Exit Ticket — Quadratic Functions and Complex Numbers <span class="arrow">→</span></a>
-    </div>
-  </section>
-
-  <section class="subject">
-    <div class="sec-head"><h2>📘 Algebra II — Module 3, Topic 1</h2></div>
-    <p class="sub">Polynomial functions: modeling area and volume, building cubics from factors</p>
-    <div class="links">
+  <section class="subject acc" id="m3">
+    <details class="mod" id="m3-d">
+      <summary><span class="mod-txt"><span class="mod-num">Module 3</span><h2>Cubic Functions and Polynomials</h2><span class="mod-meta">3 topics &middot; 11 lessons &middot; exit ticket</span></span><span class="chev">&#8250;</span></summary>
+      <div class="mod-body">
+      <details class="topic" id="m3t1">
+        <summary><span class="t-txt"><span class="t-num">Topic 1</span><span class="t-name">Polynomial functions: modeling area and volume, building cubics from factors</span></span><span class="t-count">4 lessons</span><span class="chev">&#8250;</span></summary>
+        <div class="t-body"><div class="links">
       <a class="lesson" href="Algebra2_M3T1L1_OnLevel.html">Lesson 1 — Modeling with Functions <span class="arrow">→</span></a>
       <a class="lesson" href="Algebra2_M3T1L2_OnLevel.html">Lesson 2 — Transforming Function Shapes <span class="arrow">→</span></a>
       <a class="lesson" href="Algebra2_M3T1L3_OnLevel.html">Lesson 3 — Exploring Cubic Functions <span class="arrow">→</span></a>
       <a class="lesson" href="Algebra2_M3T1L4_OnLevel.html">Lesson 4 — Decomposing Cubic Functions <span class="arrow">→</span></a>
-    </div>
-  </section>
-
-  <section class="subject">
-    <div class="sec-head"><h2>📘 Algebra II — Module 3, Topic 2</h2></div>
-    <p class="sub">Cubic functions: symmetry, transformations, and key attributes (extrema, real and imaginary zeros)</p>
-    <div class="links">
+    </div></div>
+      </details>
+      <details class="topic" id="m3t2">
+        <summary><span class="t-txt"><span class="t-num">Topic 2</span><span class="t-name">Cubic functions: symmetry, transformations, and key attributes (extrema, real and imaginary zeros)</span></span><span class="t-count">3 lessons</span><span class="chev">&#8250;</span></summary>
+        <div class="t-body"><div class="links">
       <a class="lesson" href="Algebra2_M3T2L1_OnLevel.html">Lesson 1 — Symmetric Functions <span class="arrow">→</span></a>
       <a class="lesson" href="Algebra2_M3T2L2_OnLevel.html">Lesson 2 — Transformations of Cubic Functions <span class="arrow">→</span></a>
       <a class="lesson" href="Algebra2_M3T2L3_OnLevel.html">Lesson 3 — Key Attributes of Cubic Functions <span class="arrow">→</span></a>
-    </div>
-  </section>
-
-  <section class="subject">
-    <div class="sec-head"><h2>📘 Algebra II — Module 3, Topic 3</h2></div>
-    <p class="sub">Polynomial operations: adding, subtracting, multiplying, and factoring polynomials to identify zeros, and polynomial division</p>
-    <div class="links">
+    </div></div>
+      </details>
+      <details class="topic" id="m3t3">
+        <summary><span class="t-txt"><span class="t-num">Topic 3</span><span class="t-name">Polynomial operations: adding, subtracting, multiplying, and factoring polynomials to identify zeros, and polynomial division</span></span><span class="t-count">4 lessons</span><span class="chev">&#8250;</span></summary>
+        <div class="t-body"><div class="links">
       <a class="lesson" href="Algebra2_M3T3L1_OnLevel.html">Lesson 1 — Adding, Subtracting, and Multiplying Polynomials <span class="arrow">→</span></a>
       <a class="lesson" href="Algebra2_M3T3L2_OnLevel.html">Lesson 2 — Factoring Polynomials to Identify Zeros <span class="arrow">→</span></a>
       <a class="lesson" href="Algebra2_M3T3L3_OnLevel.html">Lesson 3 — Polynomial Division <span class="arrow">→</span></a>
       <a class="lesson" href="Algebra2_M3T3L4_OnLevel.html">Lesson 4 — Rational Root Theorem <span class="arrow">→</span></a>
-    </div>
+    </div></div>
+      </details>
+      <div class="exit-row"><div class="links">
+      <a class="lesson exit" href="Algebra2_M3_ExitTicket.html">Module 3 Exit Ticket — Cubic Functions and Polynomials <span class="arrow">→</span></a>
+    </div></div>
+      </div>
+    </details>
   </section>
 
-  <section class="subject">
-    <div class="sec-head"><h2>📘 Algebra II — Module 3 Exit Ticket</h2></div>
-    <p class="sub">Check your understanding of all of Module 3: a practice set, then 10 graded questions</p>
-    <div class="links">
-      <a class="lesson" href="Algebra2_M3_ExitTicket.html">Module 3 Exit Ticket — Cubic Functions and Polynomials <span class="arrow">→</span></a>
-    </div>
-  </section>
-
-  <section class="subject">
-    <div class="sec-head"><h2>📘 Algebra II — Module 4, Topic 1</h2></div>
-    <p class="sub">Rational functions: inverse variation, the reciprocal function, asymptotes, and rational equations</p>
-    <div class="links">
+  <section class="subject acc" id="m4">
+    <details class="mod" id="m4-d">
+      <summary><span class="mod-txt"><span class="mod-num">Module 4</span><h2>Rational and Radical Functions</h2><span class="mod-meta">3 topics &middot; 11 lessons</span></span><span class="chev">&#8250;</span></summary>
+      <div class="mod-body">
+      <details class="topic" id="m4t1">
+        <summary><span class="t-txt"><span class="t-num">Topic 1</span><span class="t-name">Rational functions: inverse variation, the reciprocal function, asymptotes, and rational equations</span></span><span class="t-count">6 lessons</span><span class="chev">&#8250;</span></summary>
+        <div class="t-body"><div class="links">
       <a class="lesson" href="Algebra2_M4T1L1_OnLevel.html">Lesson 1 — Introduction to Rational Functions <span class="arrow">→</span></a>
       <a class="lesson" href="Algebra2_M4T1L2_OnLevel.html">Lesson 2 — Transformations of Rational Functions <span class="arrow">→</span></a>
       <a class="lesson" href="Algebra2_M4T1L3_OnLevel.html">Lesson 3 — Exploring Asymptotes <span class="arrow">→</span></a>
       <a class="lesson" href="Algebra2_M4T1L4_OnLevel.html">Lesson 4 — Operations with Rational Expressions <span class="arrow">→</span></a>
       <a class="lesson" href="Algebra2_M4T1L5_OnLevel.html">Lesson 5 — Solving Problems with Rational Equations <span class="arrow">→</span></a>
       <a class="lesson" href="Algebra2_M4T1L6_OnLevel.html">Lesson 6 — Solving Work, Mixture, Distance, and Cost Problems <span class="arrow">→</span></a>
-    </div>
-  </section>
-
-  <section class="subject">
-    <div class="sec-head"><h2>📘 Algebra II — Module 4, Topic 2</h2></div>
-    <p class="sub">Radical functions: inverses of power functions, radical functions and their transformations, and compositions</p>
-    <div class="links">
+    </div></div>
+      </details>
+      <details class="topic" id="m4t2">
+        <summary><span class="t-txt"><span class="t-num">Topic 2</span><span class="t-name">Radical functions: inverses of power functions, radical functions and their transformations, and compositions</span></span><span class="t-count">4 lessons</span><span class="chev">&#8250;</span></summary>
+        <div class="t-body"><div class="links">
       <a class="lesson" href="Algebra2_M4T2L1_OnLevel.html">Lesson 1 — Inverses of Power Functions <span class="arrow">→</span></a>
       <a class="lesson" href="Algebra2_M4T2L2_OnLevel.html">Lesson 2 — Radical Functions <span class="arrow">→</span></a>
       <a class="lesson" href="Algebra2_M4T2L3_OnLevel.html">Lesson 3 — Transformations of Radical Functions <span class="arrow">→</span></a>
       <a class="lesson" href="Algebra2_M4T2L4_OnLevel.html">Lesson 4 — Compositions of Functions <span class="arrow">→</span></a>
-    </div>
-  </section>
-
-  <section class="subject">
-    <div class="sec-head"><h2>📘 Algebra II — Module 4, Topic 3</h2></div>
-    <p class="sub">Radical expressions and equations: rewriting radicals, solving radical equations, and modeling with radical functions</p>
-    <div class="links">
+    </div></div>
+      </details>
+      <details class="topic" id="m4t3">
+        <summary><span class="t-txt"><span class="t-num">Topic 3</span><span class="t-name">Radical expressions and equations: rewriting radicals, solving radical equations, and modeling with radical functions</span></span><span class="t-count">1 lesson</span><span class="chev">&#8250;</span></summary>
+        <div class="t-body"><div class="links">
       <a class="lesson" href="Algebra2_M4T3L1_OnLevel.html">Lesson 1 — Rewriting Radical Expressions <span class="arrow">→</span></a>
-    </div>
+    </div></div>
+      </details>
+      </div>
+    </details>
   </section>
 
-  <section class="subject">
-    <div class="sec-head"><h2>📘 Algebra II — Tests</h2></div>
-    <p class="sub">Stand-alone tests</p>
-    <div class="links">
+  <section class="subject acc" id="tests">
+    <details class="mod" id="tests-d">
+      <summary><span class="mod-txt"><h2>Tests</h2><span class="mod-meta">Stand-alone tests</span></span><span class="chev">&#8250;</span></summary>
+      <div class="mod-body"><div class="links">
       <a class="lesson" href="Algebra2_MatricesTest.html">Matrices Test <span class="arrow">→</span></a>
-    </div>
+    </div></div>
+    </details>
   </section>
 
-  <section class="subject">
-    <div class="sec-head"><h2>📘 Algebra II — Explore</h2></div>
-    <p class="sub">Interactive tools for trying ideas out</p>
-    <div class="links">
+  <section class="subject acc" id="explore">
+    <details class="mod" id="explore-d">
+      <summary><span class="mod-txt"><h2>Explore</h2><span class="mod-meta">Interactive tools for trying ideas out</span></span><span class="chev">&#8250;</span></summary>
+      <div class="mod-body"><div class="links">
       <a class="lesson" href="Algebra2_ComplexRotator.html">Complex Number Rotator — what does multiplying by <i>i</i> do? <span class="arrow">→</span></a>
-    </div>
+    </div></div>
+    </details>
   </section>
 
 </div>
@@ -284,6 +333,57 @@
   window.addEventListener('scroll',update,{passive:true});
   window.addEventListener('resize',update);
   update();
+})();
+</script>
+<script>
+/* MODULE ACCORDION (2026-11-08): modules and topics open on click; the open ones are remembered for this tab.
+   #m3 in the address opens Module 3. With a schedule filter on (Due this week, Past due ...), every card with a
+   matching lesson opens and empty topics hide; Clear filters puts the cards back. With no saved state, the module
+   with the next due lesson opens by itself. */
+(function(){
+  var KEY='rh-acc:'+(location.pathname.split('/').pop()||''), filtering=false, saved=null;
+  var all=function(){ return [].slice.call(document.querySelectorAll('details.mod, details.topic')); };
+  function save(){ if(filtering) return; try{ sessionStorage.setItem(KEY, JSON.stringify(all().filter(function(d){ return d.open; }).map(function(d){ return d.id; }))); }catch(e){} }
+  function restore(ids){ all().forEach(function(d){ d.open = ids.indexOf(d.id) >= 0; }); }
+  var st=null; try{ st=JSON.parse(sessionStorage.getItem(KEY)||'null'); }catch(e){}
+  var h=(location.hash||'').replace('#','');
+  if(/^m\d+$/.test(h) && document.getElementById(h+'-d')){ document.getElementById(h+'-d').open=true; }
+  else if(st) restore(st);
+  document.addEventListener('toggle', function(e){ if(e.target.matches && e.target.matches('details.mod, details.topic')) save(); }, true);
+  var tools=document.getElementById('accTools');
+  if(tools) tools.addEventListener('click', function(e){
+    var b=e.target.closest('button'); if(!b) return;
+    var open=b.getAttribute('data-a')==='open';
+    document.querySelectorAll('details.mod').forEach(function(d){ d.open=open; });
+    if(!open) document.querySelectorAll('details.topic').forEach(function(d){ d.open=false; });
+    save();
+  });
+  function visible(a){ return a.style.display!=='none'; }
+  var autoDone=false;
+  function sync(){
+    var rb=document.getElementById('rhBox'); if(rb && tools && rb.nextElementSibling!==tools && !sync.moved){ sync.moved=true; rb.parentNode.insertBefore(tools, rb.nextSibling); }
+    var cnt=document.getElementById('rhCount'), active=!!(cnt && /Showing/.test(cnt.textContent||''));
+    if(active && !filtering){ saved=all().filter(function(d){ return d.open; }).map(function(d){ return d.id; }); filtering=true; }
+    document.querySelectorAll('details.topic').forEach(function(t){
+      var ls=[].slice.call(t.querySelectorAll('a.lesson')), any=ls.some(visible);
+      t.style.display=(active && !any)?'none':'';
+      if(active) t.open=any;
+    });
+    if(active) document.querySelectorAll('details.mod').forEach(function(m){ m.open=[].slice.call(m.querySelectorAll('a.lesson')).some(visible); });
+    if(!active && filtering){ filtering=false; if(saved) restore(saved); saved=null; }
+    if(!autoDone && !st && !/^m\d+$/.test(h) && document.querySelector('.rh-due')){
+      autoDone=true;
+      var now=new Date(), best=null, bestT=Infinity;
+      [].slice.call(document.querySelectorAll('.rh-due')).forEach(function(s){
+        var mm=/^Due \w+, (\w+) (\d+)/.exec(s.textContent||''); if(!mm) return;
+        var d=new Date(mm[1]+' '+mm[2]+' '+now.getFullYear()); if(isNaN(d)) return;
+        if(d-now < -180*864e5) d.setFullYear(d.getFullYear()+1);
+        if(d<bestT){ bestT=d; best=s; }
+      });
+      if(best){ var t=best.closest('details.topic'), m=best.closest('details.mod'); if(m) m.open=true; if(t) t.open=true; }
+    }
+  }
+  new MutationObserver(function(){ clearTimeout(sync.t); sync.t=setTimeout(sync, 30); }).observe(document.body, {subtree:true, childList:true, attributes:true, attributeFilter:['style']});
 })();
 </script>
 <script src="storage-cleanup.js"></script>
