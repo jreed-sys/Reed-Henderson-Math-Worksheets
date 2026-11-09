@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-06",
+"generated": "2026-11-09",
 "pages": {
 "Algebra2_M1T1L1.html": {
 "subject": "Algebra2",
@@ -835,6 +835,51 @@
 "subject": "Geometry",
 "id": "M3_ExitTicket",
 "topic": "Geometry M3 Exit Ticket"
+},
+"Algebra2_M4T3L2.html": {
+"subject": "Algebra2",
+"id": "M4T3L2",
+"topic": "Algebra II M4 T3 L2: Solving Radical Equations (Honors)"
+},
+"Algebra2_M4T3L2_OnLevel.html": {
+"subject": "Algebra2",
+"id": "M4T3L2",
+"topic": "Algebra II M4 T3 L2: Solving Radical Equations (On-Level)"
+},
+"Geometry_M4T1L3.html": {
+"subject": "Geometry",
+"id": "M4T1L3",
+"topic": "Geometry M4 T1 L3: Sectors and Segments of a Circle (Honors)"
+},
+"Geometry_M4T1L3_OnLevel.html": {
+"subject": "Geometry",
+"id": "M4T1L3",
+"topic": "Geometry M4 T1 L3: Sectors and Segments of a Circle (On-Level)"
+},
+"Algebra2_M4T3L3.html": {
+"subject": "Algebra2",
+"id": "M4T3L3",
+"topic": "Algebra II M4 T3 L3: Modeling with Radical Functions (Honors)"
+},
+"Algebra2_M4T3L3_OnLevel.html": {
+"subject": "Algebra2",
+"id": "M4T3L3",
+"topic": "Algebra II M4 T3 L3: Modeling with Radical Functions (On-Level)"
+},
+"Algebra2_M4_ExitTicket.html": {
+"subject": "Algebra2",
+"id": "M4_ExitTicket",
+"topic": "Algebra II M4 Exit Ticket"
+},
+"Geometry_M4T1L4.html": {
+"subject": "Geometry",
+"id": "M4T1L4",
+"topic": "Geometry M4 T1 L4: Deriving the Equation of a Circle (Honors)"
+},
+"Geometry_M4T1L4_OnLevel.html": {
+"subject": "Geometry",
+"id": "M4T1L4",
+"topic": "Geometry M4 T1 L4: Deriving the Equation of a Circle (On-Level)"
 }
 }
 }
