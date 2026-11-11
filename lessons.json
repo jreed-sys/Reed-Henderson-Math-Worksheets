@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-09",
+"generated": "2026-11-11",
 "pages": {
 "Algebra2_M1T1L1.html": {
 "subject": "Algebra2",
@@ -920,6 +920,111 @@
 "subject": "Geometry",
 "id": "M4T2L1",
 "topic": "Geometry M4 T2 L1: Building Three-Dimensional Figures (On-Level)"
+},
+"Algebra2_M5T1L3.html": {
+"subject": "Algebra2",
+"id": "M5T1L3",
+"topic": "Algebra II M5 T1 L3: Transformations of Exponential Functions (Honors)"
+},
+"Algebra2_M5T1L3_OnLevel.html": {
+"subject": "Algebra2",
+"id": "M5T1L3",
+"topic": "Algebra II M5 T1 L3: Transformations of Exponential Functions (On-Level)"
+},
+"Geometry_M4T2L2.html": {
+"subject": "Geometry",
+"id": "M4T2L2",
+"topic": "Geometry M4 T2 L2: Cross-Sections (Honors)"
+},
+"Geometry_M4T2L2_OnLevel.html": {
+"subject": "Geometry",
+"id": "M4T2L2",
+"topic": "Geometry M4 T2 L2: Cross-Sections (On-Level)"
+},
+"Algebra2_M5T1L4.html": {
+"subject": "Algebra2",
+"id": "M5T1L4",
+"topic": "Algebra II M5 T1 L4: Modeling with Exponential Functions (Honors)"
+},
+"Algebra2_M5T1L4_OnLevel.html": {
+"subject": "Algebra2",
+"id": "M5T1L4",
+"topic": "Algebra II M5 T1 L4: Modeling with Exponential Functions (On-Level)"
+},
+"Geometry_M4T2L3.html": {
+"subject": "Geometry",
+"id": "M4T2L3",
+"topic": "Geometry M4 T2 L3: Building Volume Formulas for Pyramids, Cones, and Spheres (Honors)"
+},
+"Geometry_M4T2L3_OnLevel.html": {
+"subject": "Geometry",
+"id": "M4T2L3",
+"topic": "Geometry M4 T2 L3: Building Volume Formulas for Pyramids, Cones, and Spheres (On-Level)"
+},
+"Algebra2_M5T1L5.html": {
+"subject": "Algebra2",
+"id": "M5T1L5",
+"topic": "Algebra II M5 T1 L5: Logarithmic Functions (Honors)"
+},
+"Algebra2_M5T1L5_OnLevel.html": {
+"subject": "Algebra2",
+"id": "M5T1L5",
+"topic": "Algebra II M5 T1 L5: Logarithmic Functions (On-Level)"
+},
+"Geometry_M4T2L4.html": {
+"subject": "Geometry",
+"id": "M4T2L4",
+"topic": "Geometry M4 T2 L4: Building Lateral and Surface Area Formulas for Pyramids, Cones, and Spheres (Honors)"
+},
+"Geometry_M4T2L4_OnLevel.html": {
+"subject": "Geometry",
+"id": "M4T2L4",
+"topic": "Geometry M4 T2 L4: Building Lateral and Surface Area Formulas for Pyramids, Cones, and Spheres (On-Level)"
+},
+"Geometry_M4_ExitTicket.html": {
+"subject": "Geometry",
+"id": "M4_ExitTicket",
+"topic": "Geometry M4 Exit Ticket"
+},
+"Algebra2_M5T1L6.html": {
+"subject": "Algebra2",
+"id": "M5T1L6",
+"topic": "Algebra II M5 T1 L6: Transformations of Logarithmic Functions (Honors)"
+},
+"Algebra2_M5T1L6_OnLevel.html": {
+"subject": "Algebra2",
+"id": "M5T1L6",
+"topic": "Algebra II M5 T1 L6: Transformations of Logarithmic Functions (On-Level)"
+},
+"Geometry_M5T1L1.html": {
+"subject": "Geometry",
+"id": "M5T1L1",
+"topic": "Geometry M5 T1 L1: Compound Sample Spaces (Honors)"
+},
+"Geometry_M5T1L1_OnLevel.html": {
+"subject": "Geometry",
+"id": "M5T1L1",
+"topic": "Geometry M5 T1 L1: Compound Sample Spaces (On-Level)"
+},
+"Algebra2_M5T2L1.html": {
+"subject": "Algebra2",
+"id": "M5T2L1",
+"topic": "Algebra II M5 T2 L1: Logarithmic Expressions (Honors)"
+},
+"Algebra2_M5T2L1_OnLevel.html": {
+"subject": "Algebra2",
+"id": "M5T2L1",
+"topic": "Algebra II M5 T2 L1: Logarithmic Expressions (On-Level)"
+},
+"Geometry_M5T1L2.html": {
+"subject": "Geometry",
+"id": "M5T1L2",
+"topic": "Geometry M5 T1 L2: Compound Probability with And (Honors)"
+},
+"Geometry_M5T1L2_OnLevel.html": {
+"subject": "Geometry",
+"id": "M5T1L2",
+"topic": "Geometry M5 T1 L2: Compound Probability with And (On-Level)"
 }
 }
 }
