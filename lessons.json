@@ -1160,6 +1160,21 @@
 "subject": "Geometry",
 "id": "M5T2L4",
 "topic": "Geometry M5 T2 L4: Independent Trials (On-Level)"
+},
+"Geometry_M5_ExitTicket.html": {
+"subject": "Geometry",
+"id": "M5_ExitTicket",
+"topic": "Geometry M5 Exit Ticket"
+},
+"Geometry_M5T2L5.html": {
+"subject": "Geometry",
+"id": "M5T2L5",
+"topic": "Geometry M5 T2 L5: Expected Value (Honors)"
+},
+"Geometry_M5T2L5_OnLevel.html": {
+"subject": "Geometry",
+"id": "M5T2L5",
+"topic": "Geometry M5 T2 L5: Expected Value (On-Level)"
 }
 }
 }
