@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-12",
+"generated": "2026-11-13",
 "pages": {
 "Algebra2_M1T1L1.html": {
 "subject": "Algebra2",
@@ -1075,6 +1075,91 @@
 "subject": "Algebra2",
 "id": "M1T2L3",
 "topic": "Algebra II M1 T2 L3: Solving Systems with Matrices (On-Level)"
+},
+"Algebra2_M5T2L3.html": {
+"subject": "Algebra2",
+"id": "M5T2L3",
+"topic": "Algebra II M5 T2 L3: Solving Logarithmic Equations (Honors)"
+},
+"Algebra2_M5T2L3_OnLevel.html": {
+"subject": "Algebra2",
+"id": "M5T2L3",
+"topic": "Algebra II M5 T2 L3: Solving Logarithmic Equations (On-Level)"
+},
+"Geometry_M5T1L4.html": {
+"subject": "Geometry",
+"id": "M5T1L4",
+"topic": "Geometry M5 T1 L4: Calculating Compound Probability (Honors)"
+},
+"Geometry_M5T1L4_OnLevel.html": {
+"subject": "Geometry",
+"id": "M5T1L4",
+"topic": "Geometry M5 T1 L4: Calculating Compound Probability (On-Level)"
+},
+"Algebra2_M5T2L4.html": {
+"subject": "Algebra2",
+"id": "M5T2L4",
+"topic": "Algebra II M5 T2 L4: Applications of Exponential and Logarithmic Equations (Honors)"
+},
+"Algebra2_M5T2L4_OnLevel.html": {
+"subject": "Algebra2",
+"id": "M5T2L4",
+"topic": "Algebra II M5 T2 L4: Applications of Exponential and Logarithmic Equations (On-Level)"
+},
+"Geometry_M5T2L1.html": {
+"subject": "Geometry",
+"id": "M5T2L1",
+"topic": "Geometry M5 T2 L1: Compound Probability for Data Displayed in Two-Way Tables (Honors)"
+},
+"Geometry_M5T2L1_OnLevel.html": {
+"subject": "Geometry",
+"id": "M5T2L1",
+"topic": "Geometry M5 T2 L1: Compound Probability for Data Displayed in Two-Way Tables (On-Level)"
+},
+"Algebra2_M5_ExitTicket.html": {
+"subject": "Algebra2",
+"id": "M5_ExitTicket",
+"topic": "Algebra II M5 Exit Ticket"
+},
+"Algebra2_M5T2L5.html": {
+"subject": "Algebra2",
+"id": "M5T2L5",
+"topic": "Algebra II M5 T2 L5: Modeling with Linear, Quadratic, and Exponential Functions (Honors)"
+},
+"Algebra2_M5T2L5_OnLevel.html": {
+"subject": "Algebra2",
+"id": "M5T2L5",
+"topic": "Algebra II M5 T2 L5: Modeling with Linear, Quadratic, and Exponential Functions (On-Level)"
+},
+"Geometry_M5T2L2.html": {
+"subject": "Geometry",
+"id": "M5T2L2",
+"topic": "Geometry M5 T2 L2: Conditional Probability (Honors)"
+},
+"Geometry_M5T2L2_OnLevel.html": {
+"subject": "Geometry",
+"id": "M5T2L2",
+"topic": "Geometry M5 T2 L2: Conditional Probability (On-Level)"
+},
+"Geometry_M5T2L3.html": {
+"subject": "Geometry",
+"id": "M5T2L3",
+"topic": "Geometry M5 T2 L3: Permutations and Combinations (Honors)"
+},
+"Geometry_M5T2L3_OnLevel.html": {
+"subject": "Geometry",
+"id": "M5T2L3",
+"topic": "Geometry M5 T2 L3: Permutations and Combinations (On-Level)"
+},
+"Geometry_M5T2L4.html": {
+"subject": "Geometry",
+"id": "M5T2L4",
+"topic": "Geometry M5 T2 L4: Independent Trials (Honors)"
+},
+"Geometry_M5T2L4_OnLevel.html": {
+"subject": "Geometry",
+"id": "M5T2L4",
+"topic": "Geometry M5 T2 L4: Independent Trials (On-Level)"
 }
 }
 }

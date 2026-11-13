@@ -1,0 +1,64 @@
+﻿Lesson ID,Due date,Note (optional),Title (for reference; ignored)
+M1T1L1,,,"Points, Lines, Planes, Rays, and Line Segments"
+M1T1L2,,,Formal Reasoning in Euclidean Geometry
+M1T1L3,,,Making Conjectures and Deductive Reasoning
+M1T2L1,,,Constructing a Coordinate Plane
+M1T2L2,,,Parallel and Perpendicular Lines
+M1T2L3,,,Classifying Quadrilaterals on the Coordinate Plane
+M1T2L4,,,Classifying Triangles on the Coordinate Plane
+M1T2L5,,,Area and Perimeter on the Coordinate Plane
+M1T3L1,,,Translations On and Off the Coordinate Plane
+M1T3L2,,,Sequences of Multiple Translations
+M1T3L3,,,Reflections On and Off the Coordinate Plane
+M1T3L4,,,Rotations On and Off the Coordinate Plane
+M1T3L5,,,Compositions of Functions
+M1T4L1,,,Reflectional and Rotational Symmetry
+M1T4L2,,,Proving Triangle Congruence Theorems
+M1T4L3,,,Using Triangle Congruence to Solve Problems
+M1_ExitTicket,,,Geometry M1 Exit Ticket
+M2T1L1,,,Using Circles to Make Conjectures
+M2T1L2,,,Conjectures About Quadrilaterals
+M2T1L3,,,Constructing an Inscribed Regular Polygon
+M2T1L4,,,Conjectures About Triangles
+M2T1L5,,,Points of Concurrency
+M2T2L1,,,Forms of Proof
+M2T2L2,,,Proving Parallel Line Theorems
+M2T2L3,,,Interior and Exterior Angles of Polygons
+M2T2L4,,,Perpendicular Bisector and Isosceles Triangle Theorems
+M2T2L5,,,"Inverse, Contrapositive, Direct Proof, and Indirect Proof"
+M2T2L6,,,Angle Relationships Inside and Outside Circles
+M2T3L1,,,Using Triangle Congruence to Determine Relationships Between Segments
+M2T3L2,,,Using Congruent Triangles to Determine Relationships Between Chords and Tangents
+M2T3L3,,,Properties of Quadrilaterals
+M2_ExitTicket,,,Geometry M2 Exit Ticket
+M3T1L1,,,Dilating Figures to Create Similar Figures
+M3T1L2,,,Establishing Triangle Similarity Criteria
+M3T1L3,,,Theorems About Proportionality
+M3T1L4,,,More Similar Triangles
+M3T1L5,,,Application of Similar Triangles
+M3T1L6,,,Partitioning Segments in Given Ratios
+M3T2L1,,,Introduction to Trigonometry
+M3T2L2,,,Tangent Ratio and Inverse Tangent
+M3T2L3,,,Exploring Sine and Cosine Ratios
+M3T2L4,,,Complement Angle Relationships
+M3_ExitTicket,,,Geometry M3 Exit Ticket
+M4T1L1,,,"Tangents, Secants, and More Chords"
+M4T1L2,,,Similarity Relationships in Circles
+M4T1L3,,,Sectors and Segments of a Circle
+M4T1L4,,,Deriving the Equation of a Circle
+M4T1L5,,,Determining Points on a Circle
+M4T2L1,,,Building Three-Dimensional Figures
+M4T2L2,,,Cross-Sections
+M4T2L3,,,"Building Volume Formulas for Pyramids, Cones, and Spheres"
+M4T2L4,,,"Building Lateral and Surface Area Formulas for Pyramids, Cones, and Spheres"
+M4_ExitTicket,,,Geometry M4 Exit Ticket
+M5T1L1,,,Compound Sample Spaces
+M5T1L2,,,Compound Probability with And
+M5T1L3,,,Compound Probability with Or
+M5T1L4,,,Calculating Compound Probability
+M5T2L1,,,Compound Probability for Data Displayed in Two-Way Tables
+M5T2L2,,,Conditional Probability
+M5T2L3,,,Permutations and Combinations
+M5T2L4,,,Independent Trials
+TriangleCongruenceExplorer,,,Geometry Triangle Congruence Explorer
+TriangleLengthExplorer,,,Geometry Triangle Side Lengths Explorer
