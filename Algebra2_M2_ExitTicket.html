@@ -736,8 +736,6 @@ table.see-table select.ans{padding:6px 8px;font-size:13.5px;}
         <div class="sub">Algebra II &middot; Quadratic Functions and Complex Numbers</div>
       </div>
     </header>
-
-    
 <style>
 .et-fig{margin:6px 0 8px 30px;max-width:100%;}.et-fig svg{max-width:100%;height:auto;display:block;}
 input.ans.et-in{min-width:0;width:260px;max-width:100%;}
@@ -759,7 +757,10 @@ input.ans.et-in{min-width:0;width:260px;max-width:100%;}
 .et-pscore{font-weight:700;color:var(--teal-900);margin:6px 0 0;}
 .et-ready{display:block;margin:18px auto 4px;font:700 15px Inter,sans-serif;border:0;border-radius:999px;padding:12px 22px;background:#b0339e;color:#fff;cursor:pointer;}
 .et-gnote{background:#fbeef8;border:1px solid #e9b9de;border-radius:10px;padding:8px 12px;font-size:13.5px;margin:4px 0 6px;}
-@media (max-width:600px){.et-fig,.et-q-hint,.q .hint-panel,.et-pbar,.et-fb{margin-left:0;}.mc-options{margin-left:8px;}}
+.et-ins{margin:6px 0 0 30px;font-size:13px;color:var(--ink-soft);display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+.et-ins button{font:700 15px Inter,sans-serif;min-width:34px;border-radius:8px;padding:3px 10px;cursor:pointer;border:1.5px solid var(--teal-700);background:#fff;color:var(--teal-900);}
+.et-ins button:hover{background:#e9f4f3;}
+@media (max-width:600px){.et-fig,.et-q-hint,.q .hint-panel,.et-pbar,.et-fb,.et-ins{margin-left:0;}.mc-options{margin-left:8px;}}
 </style>
 <div class="keyterms"><div class="box"><b>What this exit ticket checks</b><ul><li>Forms of quadratics, writing quadratics, solving quadratic equations, and complex numbers (Topic 1)</li><li>Quadratic inequalities, linear-quadratic systems, modeling, and the equation of a parabola (Topic 2)</li></ul></div></div>
 <div class="how-box"><b>How this exit ticket works.</b> There are two sets of 10 questions on the core ideas of this module. <b>Practice set:</b> similar problems with different numbers. Press <b>Check</b> to see if you are right; nothing is graded or sent. <b>Graded exit ticket:</b> the 10 <span class="tag tag-scored">&#9733; Scored</span> questions your teacher sees when you press Submit. Your questions are in your own order, so work on your own. Use the &#128161; hints if you are stuck and the scratch space at the bottom for your work. Your work <b>saves automatically</b> on this computer.<br><b>Typing tips:</b> click a chip to copy a symbol, then paste: <span class="sym-copy" role="button" tabindex="0" data-sym="±" title="Click to copy ±">±</span> <span class="sym-copy" role="button" tabindex="0" data-sym="√" title="Click to copy √">√</span> <span class="sym-copy" role="button" tabindex="0" data-sym="≤" title="Click to copy ≤">≤</span> <span class="sym-copy" role="button" tabindex="0" data-sym="≥" title="Click to copy ≥">≥</span>. Spaces do not matter, and answers with more than one value can be in any order, separated by commas.</div>
@@ -787,7 +788,7 @@ input.ans.et-in{min-width:0;width:260px;max-width:100%;}
 <div class="q" data-ord="3">
 <span class="q-num">4</span><span class="q-text"><span class="et-topic">Topic 1</span>Solve <i>x</i>&sup2; + 6<i>x</i> + 13 = 0. <span class="tag et-ptag">&#9998; Practice &middot; not graded</span></span>
 <div class="et-q-hint"><button type="button" class="hint-toggle" data-hint="hint-p4">&#128161; Hint</button></div><div class="hint-panel" id="hint-p4">Complete the square: <i>x</i>&sup2; + <i>bx</i> = (<i>x</i> + <i>b</i>/2)&sup2; &minus; (<i>b</i>/2)&sup2;. The quadratic formula is <i>x</i> = (&minus;<i>b</i> &plusmn; &radic;(<i>b</i>&sup2; &minus; 4<i>ac</i>)) / (2<i>a</i>). The discriminant <i>b</i>&sup2; &minus; 4<i>ac</i> tells the kind of solutions. Remember <i>i</i>&sup2; = &minus;1.</div>
-<div class="answer-row"><span class="inline-field"><span class="field-label">x =</span><input type="text" class="ans et-in" id="p4" placeholder="both solutions" autocomplete="off"></span></div><div class="et-pbar"><button type="button" data-pcheck="p4">Check</button><button type="button" class="et-show" data-pshow="p4">Show answer</button></div><div class="et-fb" id="fb-p4" aria-live="polite"></div>
+<div class="answer-row"><span class="inline-field"><span class="field-label">x =</span><input type="text" class="ans et-in" id="p4" placeholder="both solutions" autocomplete="off"></span></div><div class="et-ins"><span>Insert:</span><button type="button" data-ins="±" data-for="p4" title="Insert ±">±</button><button type="button" data-ins="i" data-for="p4" title="Insert i">i</button><span>No &radic; in the final answer: simplify it with <i>i</i> (for example &radic;(&minus;9) = 3<i>i</i>). Type &plusmn; with the button or as <b>+-</b>, or enter both answers separated by a comma.</span></div><div class="et-pbar"><button type="button" data-pcheck="p4">Check</button><button type="button" class="et-show" data-pshow="p4">Show answer</button></div><div class="et-fb" id="fb-p4" aria-live="polite"></div>
 </div>
 <div class="q" data-ord="4">
 <span class="q-num">5</span><span class="q-text"><span class="et-topic">Topic 1</span>Use the discriminant. How many solutions does <i>x</i>&sup2; &minus; 6<i>x</i> + 9 = 0 have, and what kind? <span class="tag et-ptag">&#9998; Practice &middot; not graded</span></span>
@@ -844,7 +845,7 @@ input.ans.et-in{min-width:0;width:260px;max-width:100%;}
 <div class="q" data-ord="3">
 <span class="q-num">4</span><span class="q-text"><span class="et-topic">Topic 1</span>Solve <i>x</i>&sup2; &minus; 4<i>x</i> + 13 = 0. <span class="tag tag-scored">&#9733; Scored</span></span>
 <div class="et-q-hint"><button type="button" class="hint-toggle" data-hint="hint-g4">&#128161; Hint</button></div><div class="hint-panel" id="hint-g4">Complete the square: <i>x</i>&sup2; + <i>bx</i> = (<i>x</i> + <i>b</i>/2)&sup2; &minus; (<i>b</i>/2)&sup2;. The quadratic formula is <i>x</i> = (&minus;<i>b</i> &plusmn; &radic;(<i>b</i>&sup2; &minus; 4<i>ac</i>)) / (2<i>a</i>). The discriminant <i>b</i>&sup2; &minus; 4<i>ac</i> tells the kind of solutions. Remember <i>i</i>&sup2; = &minus;1.</div>
-<div class="answer-row"><span class="inline-field"><span class="field-label">x =</span><input type="text" class="ans et-in" id="q4" placeholder="both solutions" autocomplete="off"></span></div>
+<div class="answer-row"><span class="inline-field"><span class="field-label">x =</span><input type="text" class="ans et-in" id="q4" placeholder="both solutions" autocomplete="off"></span></div><div class="et-ins"><span>Insert:</span><button type="button" data-ins="±" data-for="q4" title="Insert ±">±</button><button type="button" data-ins="i" data-for="q4" title="Insert i">i</button><span>No &radic; in the final answer: simplify it with <i>i</i> (for example &radic;(&minus;9) = 3<i>i</i>). Type &plusmn; with the button or as <b>+-</b>, or enter both answers separated by a comma.</span></div>
 </div>
 <div class="q" data-ord="4">
 <span class="q-num">5</span><span class="q-text"><span class="et-topic">Topic 1</span>Use the discriminant. How many solutions does 2<i>x</i>&sup2; + 3<i>x</i> + 5 = 0 have, and what kind? <span class="tag tag-scored">&#9733; Scored</span></span>
@@ -1335,7 +1336,7 @@ const ANSWER_KEY = [
   {"id": "q1", "type": "exact", "loose": true, "correct": ["(x-3)^2-4", "f(x)=(x-3)^2-4", "y=(x-3)^2-4", "g(x)=(x-3)^2-4", "-4+(x-3)^2", "f(x)=-4+(x-3)^2", "y=-4+(x-3)^2", "g(x)=-4+(x-3)^2", "1(x-3)^2-4", "f(x)=1(x-3)^2-4", "y=1(x-3)^2-4", "g(x)=1(x-3)^2-4"], "label": "vertex form"},
   {"name": "q2", "type": "radio", "correct": ["a"], "label": "factored-form features"},
   {"id": "q3", "type": "exact", "loose": true, "correct": ["2(x-2)^2-3", "f(x)=2(x-2)^2-3", "y=2(x-2)^2-3", "g(x)=2(x-2)^2-3", "-3+2(x-2)^2", "f(x)=-3+2(x-2)^2", "y=-3+2(x-2)^2", "g(x)=-3+2(x-2)^2"], "label": "write from vertex & point"},
-  {"id": "q4", "type": "exact", "loose": true, "correct": ["2±3i", "x=2±3i", "2±i3", "x=2±i3", "2+3i,2-3i", "x=2+3i,x=2-3i", "2+3i and 2-3i", "x=2+3i and x=2-3i", "2+3i or 2-3i", "x=2+3i or x=2-3i", "2+3i;2-3i", "x=2+3i;x=2-3i", "2-3i,2+3i", "x=2-3i,x=2+3i", "2-3i and 2+3i", "x=2-3i and x=2+3i", "2-3i or 2+3i", "x=2-3i or x=2+3i", "2-3i;2+3i", "x=2-3i;x=2+3i"], "label": "complex solutions"},
+  {"id": "q4", "type": "exact", "loose": true, "correct": ["2±3i", "x=2±3i", "2±i3", "x=2±i3", "2+3i,2-3i", "x=2+3i,x=2-3i", "2+3i and 2-3i", "x=2+3i and x=2-3i", "2+3i or 2-3i", "x=2+3i or x=2-3i", "2+3i;2-3i", "x=2+3i;x=2-3i", "2-3i,2+3i", "x=2-3i,x=2+3i", "2-3i and 2+3i", "x=2-3i and x=2+3i", "2-3i or 2+3i", "x=2-3i or x=2+3i", "2-3i;2+3i", "x=2-3i;x=2+3i", "2+-3i", "2+/-3i", "x=2+-3i", "x=2+/-3i", "2+-i3", "2+/-i3", "x=2+-i3", "x=2+/-i3"], "label": "complex solutions"},
   {"name": "q5", "type": "radio", "correct": ["a"], "label": "discriminant"},
   {"id": "q6", "type": "exact", "loose": true, "correct": ["11-10i", "-10i+11", "11+-10i"], "label": "multiply complex"},
   {"name": "q7", "type": "radio", "correct": ["a"], "label": "quadratic inequality"},
@@ -1348,7 +1349,7 @@ const PRACTICE_KEY = [
   {"id": "p1", "type": "exact", "correct": ["(x+4)^2-6", "f(x)=(x+4)^2-6", "y=(x+4)^2-6", "g(x)=(x+4)^2-6", "-6+(x+4)^2", "f(x)=-6+(x+4)^2", "y=-6+(x+4)^2", "g(x)=-6+(x+4)^2"], "show": "(<i>x</i> + 4)&sup2; &minus; 6", "why": "Half of 8 is 4, and 4&sup2; = 16: <i>x</i>&sup2; + 8<i>x</i> + 16 &minus; 16 + 10 = (<i>x</i> + 4)&sup2; &minus; 6."},
   {"name": "p2", "type": "radio", "why": "Set each factor to 0 for the zeros. The axis is halfway between them: (3 + (&minus;1))/2 = 1. <i>a</i> = 2 &gt; 0, so it opens up and the vertex is a minimum."},
   {"id": "p3", "type": "exact", "correct": ["-2(x+1)^2+4", "f(x)=-2(x+1)^2+4", "y=-2(x+1)^2+4", "g(x)=-2(x+1)^2+4", "4-2(x+1)^2", "f(x)=4-2(x+1)^2", "y=4-2(x+1)^2", "g(x)=4-2(x+1)^2"], "show": "<i>f</i>(<i>x</i>) = &minus;2(<i>x</i> + 1)&sup2; + 4", "why": "Substitute (1, &minus;4) into <i>a</i>(<i>x</i> + 1)&sup2; + 4: &minus;4 = 4<i>a</i> + 4, so <i>a</i> = &minus;2."},
-  {"id": "p4", "type": "exact", "correct": ["-3±2i", "x=-3±2i", "-3±i2", "x=-3±i2", "-3+2i,-3-2i", "x=-3+2i,x=-3-2i", "-3+2i and -3-2i", "x=-3+2i and x=-3-2i", "-3+2i or -3-2i", "x=-3+2i or x=-3-2i", "-3+2i;-3-2i", "x=-3+2i;x=-3-2i", "-3-2i,-3+2i", "x=-3-2i,x=-3+2i", "-3-2i and -3+2i", "x=-3-2i and x=-3+2i", "-3-2i or -3+2i", "x=-3-2i or x=-3+2i", "-3-2i;-3+2i", "x=-3-2i;x=-3+2i"], "show": "<i>x</i> = &minus;3 &plusmn; 2<i>i</i>", "why": "<i>x</i> = (&minus;6 &plusmn; &radic;(36 &minus; 52))/2 = (&minus;6 &plusmn; &radic;(&minus;16))/2 = (&minus;6 &plusmn; 4<i>i</i>)/2."},
+  {"id": "p4", "type": "exact", "correct": ["-3±2i", "x=-3±2i", "-3±i2", "x=-3±i2", "-3+2i,-3-2i", "x=-3+2i,x=-3-2i", "-3+2i and -3-2i", "x=-3+2i and x=-3-2i", "-3+2i or -3-2i", "x=-3+2i or x=-3-2i", "-3+2i;-3-2i", "x=-3+2i;x=-3-2i", "-3-2i,-3+2i", "x=-3-2i,x=-3+2i", "-3-2i and -3+2i", "x=-3-2i and x=-3+2i", "-3-2i or -3+2i", "x=-3-2i or x=-3+2i", "-3-2i;-3+2i", "x=-3-2i;x=-3+2i", "-3+-2i", "-3+/-2i", "x=-3+-2i", "x=-3+/-2i", "-3+-i2", "-3+/-i2", "x=-3+-i2", "x=-3+/-i2"], "show": "<i>x</i> = &minus;3 &plusmn; 2<i>i</i>", "why": "<i>x</i> = (&minus;6 &plusmn; &radic;(36 &minus; 52))/2 = (&minus;6 &plusmn; &radic;(&minus;16))/2 = (&minus;6 &plusmn; 4<i>i</i>)/2."},
   {"name": "p5", "type": "radio", "why": "<i>b</i>&sup2; &minus; 4<i>ac</i> = 36 &minus; 36 = 0. A discriminant of 0 means one repeated real root (here <i>x</i> = 3)."},
   {"id": "p6", "type": "exact", "correct": ["11-13i", "-13i+11"], "show": "11 &minus; 13<i>i</i>", "why": "6 + 2<i>i</i> &minus; 15<i>i</i> &minus; 5<i>i</i>&sup2; = 6 &minus; 13<i>i</i> + 5 = 11 &minus; 13<i>i</i>, because <i>i</i>&sup2; = &minus;1."},
   {"name": "p7", "type": "radio", "why": "(<i>x</i> + 4)(<i>x</i> &minus; 2) &lt; 0 between the zeros &minus;4 and 2. Test <i>x</i> = 0: &minus;8 &lt; 0. True."},
@@ -2338,6 +2339,16 @@ document.addEventListener('DOMContentLoaded', () => {
 })();
 </script>
 <script>
+/* symbol buttons under a typed answer (2026-11-19): insert the symbol at the cursor, no copy/paste needed */
+document.addEventListener('click', function(ev){
+  var b=ev.target.closest && ev.target.closest('button[data-ins]'); if(!b) return;
+  var inp=document.getElementById(b.getAttribute('data-for')); if(!inp || inp.disabled || inp.readOnly) return;
+  var t=b.getAttribute('data-ins'), a=inp.selectionStart, z=inp.selectionEnd;
+  if(a==null||z==null||document.activeElement!==inp&&!inp._etSel){ a=z=inp.value.length; } else if(inp._etSel&&document.activeElement!==inp){ a=inp._etSel[0]; z=inp._etSel[1]; }
+  inp.value=inp.value.slice(0,a)+t+inp.value.slice(z); inp.focus(); var c=a+t.length; try{ inp.setSelectionRange(c,c); }catch(e){}
+  inp._etSel=[c,c]; inp.dispatchEvent(new Event('input',{bubbles:true})); inp.dispatchEvent(new Event('change',{bubbles:true}));
+});
+document.addEventListener('focusout', function(ev){ var i=ev.target; if(i&&i.classList&&i.classList.contains('et-in')){ try{ i._etSel=[i.selectionStart,i.selectionEnd]; }catch(e){} } });
 /* EXIT TICKET v2: practice set + per-student order. Order is seeded by the student's name, so it is the same
    for that student on every reload/resume (answers are restored by id, never by position) and different between
    students. Practice items are not in ANSWER_KEY: never scored, never sent. */
