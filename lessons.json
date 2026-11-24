@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-13",
+"generated": "2026-11-24",
 "pages": {
 "Algebra2_M1T1L1.html": {
 "subject": "Algebra2",
@@ -1175,6 +1175,81 @@
 "subject": "Geometry",
 "id": "M5T2L5",
 "topic": "Geometry M5 T2 L5: Expected Value (On-Level)"
+},
+"Geometry_M3T2L1_Mission1.html": {
+"subject": "Geometry",
+"id": "M3T2L1_Mission1",
+"topic": "Geometry M3 T2 L1 Mission 1: Same Angle, Same Shape"
+},
+"Geometry_M3T2L1_Mission2.html": {
+"subject": "Geometry",
+"id": "M3T2L1_Mission2",
+"topic": "Geometry M3 T2 L1 Mission 2: Name the Sides"
+},
+"Geometry_M3T2L1_Mission3.html": {
+"subject": "Geometry",
+"id": "M3T2L1_Mission3",
+"topic": "Geometry M3 T2 L1 Mission 3: Special Triangles"
+},
+"Geometry_M3T2L2_Mission1.html": {
+"subject": "Geometry",
+"id": "M3T2L2_Mission1",
+"topic": "Geometry M3 T2 L2 Mission 1: Steepness = Tangent"
+},
+"Geometry_M3T2L2_Mission2.html": {
+"subject": "Geometry",
+"id": "M3T2L2_Mission2",
+"topic": "Geometry M3 T2 L2 Mission 2: Find the Angle"
+},
+"Geometry_M3T2L3_Mission1.html": {
+"subject": "Geometry",
+"id": "M3T2L3_Mission1",
+"topic": "Geometry M3 T2 L3 Mission 1: Which Ratio?"
+},
+"Geometry_M3T2L3_Mission2.html": {
+"subject": "Geometry",
+"id": "M3T2L3_Mission2",
+"topic": "Geometry M3 T2 L3 Mission 2: Angles from Sides"
+},
+"Geometry_M3T2L4_Mission1.html": {
+"subject": "Geometry",
+"id": "M3T2L4_Mission1",
+"topic": "Geometry M3 T2 L4 Mission 1: Flip the Triangle"
+},
+"Geometry_M3T2L4_Mission2.html": {
+"subject": "Geometry",
+"id": "M3T2L4_Mission2",
+"topic": "Geometry M3 T2 L4 Mission 2: Making Choices"
+},
+"Algebra2_M3T2L3_Mission1.html": {
+"subject": "Algebra2",
+"id": "M3T2L3_Mission1",
+"topic": "Algebra II M3 T2 L3 Mission 1: Hills and Valleys"
+},
+"Algebra2_M3T2L3_Mission2.html": {
+"subject": "Algebra2",
+"id": "M3T2L3_Mission2",
+"topic": "Algebra II M3 T2 L3 Mission 2: Count the Zeros"
+},
+"Algebra2_M3T2L3_Mission3.html": {
+"subject": "Algebra2",
+"id": "M3T2L3_Mission3",
+"topic": "Algebra II M3 T2 L3 Mission 3: Sketch the Cubic"
+},
+"Geometry_M4T1L1_Mission1.html": {
+"subject": "Geometry",
+"id": "M4T1L1_Mission1",
+"topic": "Geometry M4 T1 L1 Mission 1: Crossing Chords"
+},
+"Geometry_M4T1L1_Mission2.html": {
+"subject": "Geometry",
+"id": "M4T1L1_Mission2",
+"topic": "Geometry M4 T1 L1 Mission 2: Secant Meets Secant"
+},
+"Geometry_M4T1L1_Mission3.html": {
+"subject": "Geometry",
+"id": "M4T1L1_Mission3",
+"topic": "Geometry M4 T1 L1 Mission 3: Tangent Power"
 }
 }
 }

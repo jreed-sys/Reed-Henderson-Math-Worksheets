@@ -143,6 +143,15 @@
   .acc a.lesson.exit .arrow{color:var(--answer-pink);}
   .acc a.lesson.exit:before{content:'\2605  Exit ticket';flex-basis:100%;font:700 11px/1 'Segoe UI',Helvetica,Arial,sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--answer-pink);margin-bottom:-2px;}
   .acc a.lesson.exit{flex-wrap:wrap;}
+  /* missions (2026-11-23): one shared version for every student, listed on both level pages */
+  .acc .mission-group{margin-top:14px;padding:12px 12px 14px;border-radius:12px;background:#f6effb;border:1.5px dashed #c9a3e0;}
+  .acc .mission-group .group-label{color:#4c1d6b;margin:0 0 4px;}
+  .acc .mission-group .m-sub{font-size:13px;color:var(--ink-soft);margin:0 0 10px;}
+  .acc .links.missions{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;}
+  .acc a.lesson.mission{border-color:#c9a3e0;background:#fff;font-size:14.5px;}
+  .acc a.lesson.mission:hover{background:#efe2f8;border-color:#7e3aa8;}
+  .acc a.lesson.mission .arrow{color:#7e3aa8;}
+  .acc a.lesson.mission .m-num{display:block;font:700 11px/1.2 'Segoe UI',Helvetica,Arial,sans-serif;letter-spacing:.05em;text-transform:uppercase;color:#7e3aa8;margin-bottom:3px;}
   .acc-tools{display:flex;justify-content:flex-end;gap:8px;margin:18px 0 -12px;}
   .acc-tools button{font:600 13px 'Segoe UI',Helvetica,Arial,sans-serif;border:1.5px solid var(--line);background:#fff;color:var(--teal-900);border-radius:999px;padding:6px 12px;cursor:pointer;}
   .acc-tools button:hover{border-color:var(--teal-500);}
@@ -245,7 +254,7 @@
 
   <section class="subject acc" id="m3">
     <details class="mod" id="m3-d">
-      <summary><span class="mod-txt"><span class="mod-num">Module 3</span><h2>Cubic Functions and Polynomials</h2><span class="mod-meta">3 topics &middot; 11 lessons &middot; exit ticket</span></span><span class="chev">&#8250;</span></summary>
+      <summary><span class="mod-txt"><span class="mod-num">Module 3</span><h2>Cubic Functions and Polynomials</h2><span class="mod-meta">3 topics &middot; 11 lessons &middot; 3 missions &middot; exit ticket</span></span><span class="chev">&#8250;</span></summary>
       <div class="mod-body">
       <details class="topic" id="m3t1">
         <summary><span class="t-txt"><span class="t-num">Topic 1</span><span class="t-name">Polynomial functions: modeling area and volume, building cubics from factors</span></span><span class="t-count">4 lessons</span><span class="chev">&#8250;</span></summary>
@@ -257,12 +266,20 @@
     </div></div>
       </details>
       <details class="topic" id="m3t2">
-        <summary><span class="t-txt"><span class="t-num">Topic 2</span><span class="t-name">Cubic functions: symmetry, transformations, and key attributes (extrema, real and imaginary zeros)</span></span><span class="t-count">3 lessons</span><span class="chev">&#8250;</span></summary>
+        <summary><span class="t-txt"><span class="t-num">Topic 2</span><span class="t-name">Cubic functions: symmetry, transformations, and key attributes (extrema, real and imaginary zeros)</span></span><span class="t-count">3 lessons &middot; 3 missions</span><span class="chev">&#8250;</span></summary>
         <div class="t-body"><div class="links">
       <a class="lesson" href="Algebra2_M3T2L1.html">Lesson 1 — Symmetric Functions <span class="arrow">→</span></a>
       <a class="lesson" href="Algebra2_M3T2L2.html">Lesson 2 — Transformations of Cubic Functions <span class="arrow">→</span></a>
       <a class="lesson" href="Algebra2_M3T2L3.html">Lesson 3 — Key Attributes of Cubic Functions <span class="arrow">→</span></a>
-    </div></div>
+    </div>
+  
+
+    <div class="mission-group"><p class="group-label">&#128640; Missions</p><p class="m-sub">About 10 minutes each. Instant help, and every mistake gets explained.</p>
+    <div class="links missions">
+      <a class="lesson mission" href="Algebra2_M3T2L3_Mission1.html"><span><span class="m-num">Lesson 3 &middot; Mission 1</span>Hills and Valleys</span> <span class="arrow">→</span></a>
+      <a class="lesson mission" href="Algebra2_M3T2L3_Mission2.html"><span><span class="m-num">Lesson 3 &middot; Mission 2</span>Count the Zeros</span> <span class="arrow">→</span></a>
+      <a class="lesson mission" href="Algebra2_M3T2L3_Mission3.html"><span><span class="m-num">Lesson 3 &middot; Mission 3</span>Sketch the Cubic</span> <span class="arrow">→</span></a>
+    </div></div></div>
       </details>
       <details class="topic" id="m3t3">
         <summary><span class="t-txt"><span class="t-num">Topic 3</span><span class="t-name">Polynomial operations: adding, subtracting, multiplying, and factoring polynomials to identify zeros, and polynomial division</span></span><span class="t-count">4 lessons</span><span class="chev">&#8250;</span></summary>
